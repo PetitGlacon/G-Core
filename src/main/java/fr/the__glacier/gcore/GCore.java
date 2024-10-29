@@ -1,0 +1,97 @@
+package fr.the__glacier.gcore;
+
+import fr.the__glacier.gcore.config.SQL;
+import fr.the__glacier.gcore.database.DatabasesManager;
+import fr.the__glacier.gcore.database.UserTable;
+import fr.the__glacier.gcore.listener.PlayerJoinListener;
+import fr.the__glacier.gcore.listener.PlayerLeaveListener;
+import fr.the__glacier.gcore.test.ConfigTest;
+import fr.the__glacier.gcore.test.Listeners;
+import de.tr7zw.changeme.nbtapi.NBT;
+import lombok.Getter;
+import org.bukkit.Bukkit;
+import org.bukkit.plugin.java.JavaPlugin;
+
+@Getter
+public final class GCore extends JavaPlugin {
+    @Getter
+    private static GCore instance;
+
+    private ConfigurationManager configurationManager;
+    private SQL sql;
+
+    private DatabasesManager databasesManager;
+
+    public UserTable userTable;
+
+
+    public int VERSION;
+
+    private ConfigTest configTest;
+    private ConfigTest configTest2;
+
+    @Override
+    public void onEnable() {
+        instance = this;
+        VERSION = getVersion();
+        if (!NBT.preloadApi()){
+            getLogger().warning("NBT-API wasn't initialized properly, disabling the plugin");
+            Bukkit.getPluginManager().disablePlugin(this);
+            return;
+        }
+        configurationManager = new ConfigurationManager(ConfigurationManager.PersistType.YAML, this);
+        loadConfig();
+        saveConfig();
+        this.databasesManager = new DatabasesManager(sql.SQLType, sql.host, sql.port, sql.dataBase, sql.userName, sql.password);
+        loadTables();
+        registerListeners();
+        Test();
+
+    }
+
+    @Override
+    public void onDisable() {
+        // Plugin shutdown logic
+    }
+
+    public void Test(){
+        getServer().getPluginCommand("gcore");
+        Bukkit.getPluginManager().registerEvents(new Listeners(), this);
+    }
+
+    public void loadConfig(){
+        configTest = configurationManager.load(ConfigTest.class);
+        configTest2 = configurationManager.load(ConfigTest.class);
+        sql = configurationManager.load(SQL.class);
+    }
+
+    public void saveConfig(){
+        configurationManager.save(configTest);
+        configurationManager.save(configTest2, "bonjour", "test", "test 2");
+        configurationManager.save(sql);
+    }
+
+    public void loadTables(){
+        userTable = new UserTable(databasesManager, "Users");
+    }
+    public void registerListeners(){
+        Bukkit.getPluginManager().registerEvents(new PlayerJoinListener(), this);
+        Bukkit.getPluginManager().registerEvents(new PlayerLeaveListener(), this);
+    }
+
+    private static int getVersion() {
+        String version = Bukkit.getVersion();
+        int index = version.lastIndexOf("MC:");
+        if (index != -1) {
+            version = version.substring(index + 4, version.length() - 1);
+        } else if (version.endsWith("SNAPSHOT")) {
+            index = version.indexOf(45);
+            version = version.substring(0, index);
+        }
+        int lastDot = version.lastIndexOf(46);
+        if (version.indexOf(46) != lastDot) {
+            version = version.substring(0, lastDot);
+        }
+        return Integer.parseInt(version.substring(2));
+    }
+}

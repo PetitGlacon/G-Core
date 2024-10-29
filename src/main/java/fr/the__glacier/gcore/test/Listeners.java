@@ -27,7 +27,7 @@ public class Listeners implements Listener {
             for (int i = 0; i < 3; i++) {
                 ItemStack itemStack = event.getContents().getItem(i);
                 if (itemStack != null && itemStack.getItemMeta() instanceof PotionMeta potionMeta) {
-                    GCore.getInstance().getLogger().info(potionMeta.getBasePotionData().getType().name() + " / " + potionMeta.getBasePotionData().isUpgraded());
+                    GCore.getInstance().getLogger().info(potionMeta.getBasePotionType().name() + " / " + potionMeta.getBasePotionType().isUpgradeable());
                     GCore.getInstance().getLogger().info(potionMeta.toString());
                 }
             }

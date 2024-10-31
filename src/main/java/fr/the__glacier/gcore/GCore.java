@@ -1,5 +1,8 @@
 package fr.the__glacier.gcore;
 
+import fr.the__glacier.gcore.commands.gcore.GCoreCommand;
+import fr.the__glacier.gcore.commands.gcore.GCoreCommandManager;
+import fr.the__glacier.gcore.config.Commands;
 import fr.the__glacier.gcore.config.SQL;
 import fr.the__glacier.gcore.database.DatabasesManager;
 import fr.the__glacier.gcore.database.UserTable;
@@ -10,6 +13,7 @@ import fr.the__glacier.gcore.test.Listeners;
 import de.tr7zw.changeme.nbtapi.NBT;
 import lombok.Getter;
 import org.bukkit.Bukkit;
+import org.bukkit.command.*;
 import org.bukkit.plugin.java.JavaPlugin;
 
 @Getter
@@ -19,6 +23,7 @@ public final class GCore extends JavaPlugin {
 
     private ConfigurationManager configurationManager;
     private SQL sql;
+    private Commands commands;
 
     private DatabasesManager databasesManager;
 
@@ -46,12 +51,13 @@ public final class GCore extends JavaPlugin {
         loadTables();
         registerListeners();
         Test();
+        registerCommands();
 
     }
 
     @Override
     public void onDisable() {
-        // Plugin shutdown logic
+        userTable.databasesManager.closeConnection();
     }
 
     public void Test(){
@@ -59,21 +65,36 @@ public final class GCore extends JavaPlugin {
         Bukkit.getPluginManager().registerEvents(new Listeners(), this);
     }
 
+    public void registerCommands(){
+        registerCommand("gcore", new GCoreCommand(this, new GCoreCommandManager(), commands.GCoreCMD));
+    }
+    private void registerCommand(String command, GCoreCommand gCoreCommand){
+        PluginCommand cmd = getServer().getPluginCommand(command);
+        if (cmd == null){
+            getLogger().severe(command + " is not a valid command !");
+        } else {
+            cmd.setExecutor(gCoreCommand);
+        }
+    }
+
     public void loadConfig(){
         configTest = configurationManager.load(ConfigTest.class);
         configTest2 = configurationManager.load(ConfigTest.class);
         sql = configurationManager.load(SQL.class);
+        commands = configurationManager.load(Commands.class);
     }
 
     public void saveConfig(){
         configurationManager.save(configTest);
         configurationManager.save(configTest2, "bonjour", "test", "test 2");
         configurationManager.save(sql);
+        configurationManager.save(commands);
     }
 
     public void loadTables(){
         userTable = new UserTable(databasesManager, "Users");
     }
+
     public void registerListeners(){
         Bukkit.getPluginManager().registerEvents(new PlayerJoinListener(), this);
         Bukkit.getPluginManager().registerEvents(new PlayerLeaveListener(), this);

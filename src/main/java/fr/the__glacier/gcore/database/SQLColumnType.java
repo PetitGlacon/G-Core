@@ -1,7 +1,14 @@
 package fr.the__glacier.gcore.database;
 
+import lombok.Getter;
+import lombok.Setter;
+
+@Getter
 public class SQLColumnType {
+    // Getter for the type name
     private final String typeName;
+    // Getter and Setter for length
+    @Setter
     private Integer length;
 
     // Constructor for types without length
@@ -12,20 +19,6 @@ public class SQLColumnType {
     // Constructor for types with length
     public SQLColumnType(String typeName, int length) {
         this.typeName = typeName;
-        this.length = length;
-    }
-
-    // Getter for the type name
-    public String getTypeName() {
-        return typeName;
-    }
-
-    // Getter and Setter for length
-    public Integer getLength() {
-        return length;
-    }
-
-    public void setLength(Integer length) {
         this.length = length;
     }
 

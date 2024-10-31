@@ -2,6 +2,8 @@ package fr.the__glacier.gcore.database;
 
 import com.google.common.collect.ImmutableMap;
 import fr.the__glacier.gcore.GCore;
+import org.apache.logging.log4j.Level;
+import org.apache.logging.log4j.LogManager;
 
 import java.io.File;
 import java.sql.*;
@@ -11,6 +13,7 @@ import java.util.Map;
 import java.util.logging.Logger;
 
 public class DatabasesManager {
+    private static final org.apache.logging.log4j.Logger log = LogManager.getLogger(DatabasesManager.class);
     private Connection connection;
     private final Logger logger = GCore.getInstance().getLogger();
     public SQLType sqlType;
@@ -34,7 +37,7 @@ public class DatabasesManager {
     private void createManager(String path, String fileName){
         try {
             File file = new File(path);
-            file.mkdirs();
+            boolean mkdirs = file.mkdirs();
             connection = DriverManager.getConnection("jdbc:sqlite:" + path + fileName);
             logger.info("Connection SqLite confirmée");
             this.sqlType = SQLType.SQLITE;
@@ -56,7 +59,7 @@ public class DatabasesManager {
         String[] columns = columnsType.split("/");
         int nbColumns = columns.length;
         StringBuilder queryBuilder = new StringBuilder();
-        queryBuilder.append("CREATE TABLE IF NOT EXISTS ").append(name).append(" (");
+        queryBuilder.append("REATE TABLE IF NOT EXISTS ").append(name).append(" (");
         for (int i = 0; i<nbColumns; i++){
             if (i != 0) queryBuilder.append(",");
             String[] columnWithTypes = columns[i].split(":");
@@ -67,7 +70,7 @@ public class DatabasesManager {
             String columnName = columnWithTypes[0].toUpperCase();
             String columnType = columnWithTypes[1].toUpperCase();
             if (this.sqlType == SQLType.SQLITE){
-                queryBuilder.append(columnName).append(" ").append(columnType.replace(" INT AUTO_INCREMENT PRIMARY KEY", "  INTEGER PRIMARY KEY AUTOINCREMENT"));
+                queryBuilder.append(columnName).append(" ").append(columnType.replace("INT AUTO_INCREMENT PRIMARY KEY", "INTEGER PRIMARY KEY AUTOINCREMENT"));
             } else {
                 queryBuilder.append(columnName).append(" ").append(columnType);
             }
@@ -83,7 +86,7 @@ public class DatabasesManager {
         } catch (SQLException e){
             logger.severe("Problème lors de la création de la table " + name + " dans la base de donnée.");
             logger.warning(query);
-            e.printStackTrace();
+            log.log(Level.ERROR, e.getMessage(), e);
         }
     }
     public boolean tableExists(String tableName) {
@@ -112,7 +115,7 @@ public class DatabasesManager {
         } catch (SQLException e) {
             logger.severe("Impossible de récupérer les valeurs dans la colonne " + column + " de la table " + tablename + " dans la base de donnée.");
             logger.warning(request);
-            e.printStackTrace();
+            log.log(Level.ERROR, e.getMessage(), e);
             return valeurs;
         }
     }
@@ -133,7 +136,7 @@ public class DatabasesManager {
         } catch (SQLException e) {
             logger.severe("Impossible de récupérer les valeurs dans la colonne " + column + " de la table " + tablename + " dans la base de donnée.");
             logger.warning(request);
-            e.printStackTrace();
+            log.log(Level.ERROR, e.getMessage(), e);
             return valeurs;
         }
     }
@@ -155,8 +158,8 @@ public class DatabasesManager {
         } catch (SQLException e) {
             logger.severe("Impossible de récupérer des valeurs dans la table " + tablename + " dans la base de donnée.");
             logger.warning(request);
-            e.printStackTrace();
-            return "error";
+            log.log(Level.ERROR, e.getMessage(), e);
+            return null;
         }
     }
 
@@ -182,7 +185,7 @@ public class DatabasesManager {
         } catch (SQLException e) {
             logger.severe("Impossible d'ajouter des valeurs à " + tablename + " dans la base de donnée.");
             logger.warning(request);
-            e.printStackTrace();
+            log.log(Level.ERROR, e.getMessage(), e);
         }
     }
 
@@ -195,7 +198,7 @@ public class DatabasesManager {
         } catch (SQLException e) {
             logger.severe("Impossible de changer des valeurs à " + tablename + " dans la base de donnée.");
             logger.warning(request);
-            e.printStackTrace();
+            log.log(Level.ERROR, e.getMessage(), e);
         }
     }
     public void moveLinesFromDatabase(String from, String to, String condition){
@@ -207,7 +210,7 @@ public class DatabasesManager {
         } catch (SQLException e) {
             logger.severe("Impossible de changer des valeurs de " + from + " à " + to  + " dans la base de donnée.");
             logger.warning(request);
-            e.printStackTrace();
+            log.log(Level.ERROR, e.getMessage(), e);
         }
     }
     public void removeData(String tablename, String condition){
@@ -219,7 +222,7 @@ public class DatabasesManager {
         } catch (SQLException e) {
             logger.severe("Impossible de supprimer des valeurs de " + tablename + " dans la base de donnée.");
             logger.warning(request);
-            e.printStackTrace();
+            log.log(Level.ERROR, e.getMessage(), e);
         }
     }
     public boolean dataFromDatabaseExist(String tablename, String column, String value){
@@ -236,10 +239,11 @@ public class DatabasesManager {
         } catch (SQLException e){
             logger.severe("Impossible de récupérer des valeurs dans la table " + tablename + " dans la base de donnée.");
             logger.warning(request + " / replace ? with " + value);
-            e.printStackTrace();
+            log.log(Level.ERROR, e.getMessage(), e);
             return false;
         }
     }
+
     public List<String> getDataLine(String tablename, String column, String valueColumn, int nbColonnes){
         String request = "SELECT * FROM " + tablename + " WHERE " + column + " = ?";
         try {
@@ -260,13 +264,13 @@ public class DatabasesManager {
                 logger.severe("Impossible de récupérer des valeurs dans la table " + tablename + " dans la base de donnée.");
                 logger.warning(request + " / replace ? with " + valueColumn);
                 logger.warning(statement.toString());
-                e.printStackTrace();
+                log.log(Level.ERROR, e.getMessage(), e);
                 return null;
             }
         } catch (SQLException e) {
             logger.severe("Impossible de récupérer des valeurs dans la table " + tablename + " dans la base de donnée.");
             logger.warning(request + " / replace ? with " + valueColumn);
-            e.printStackTrace();
+            log.log(Level.ERROR, e.getMessage(), e);
             return null;
         }
     }

@@ -4,7 +4,9 @@ import com.google.common.collect.ImmutableMap;
 import fr.the__glacier.gcore.GCore;
 import lombok.Getter;
 import lombok.Setter;
-import org.bukkit.Bukkit;
+import org.apache.logging.log4j.Level;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.bukkit.entity.Player;
 
 import java.util.*;
@@ -12,6 +14,7 @@ import java.util.concurrent.CompletableFuture;
 
 public class UserTable extends BaseDataTable {
 
+    private static final Logger log = LogManager.getLogger(UserTable.class);
     public HashMap<String, User> userByName = new HashMap<>();
     public HashMap<UUID, User> userByUUID = new HashMap<>();
     public UserTable(DatabasesManager databasesManager, String tableName) {
@@ -41,7 +44,7 @@ public class UserTable extends BaseDataTable {
 
                 addUserFromDB(new User(id, uuid, name, firstJoinTime, lastJoinTime, lastLeaveTime));
             } catch (Exception e){
-                e.printStackTrace();
+                log.log(Level.ERROR, e.getMessage(), e);
             }
         }
         GCore.getInstance().getLogger().warning("Data loaded from " + tableName);
@@ -58,13 +61,13 @@ public class UserTable extends BaseDataTable {
 
     public void UserJoin(Player p){
         if (!isPlayerInDb(p)){
-            User u = new User(p.getUniqueId(), p.getName(), p.getFirstPlayed(), p.getLastPlayed());
+            User u = new User(p.getUniqueId(), p.getName(), p.getFirstPlayed(), System.currentTimeMillis());
             CompletableFuture.runAsync(() -> {
                 addUserToDB(u);
                 if (isPlayerInDb(p)){
                     u.setID(getId(p));
                 } else {
-                    Bukkit.getLogger().severe("Attention, mauvaise récupération de l'ID dans la base de donnée " + tableName);
+                    GCore.getInstance().getLogger().severe("Attention, mauvaise récupération de l'ID dans la base de donnée " + tableName);
                 }
             });
         } else {
@@ -78,7 +81,7 @@ public class UserTable extends BaseDataTable {
     }
     public void UserLeave(Player p){
         if (!isPlayerInDb(p)){
-            Bukkit.getLogger().severe("Impossible de récupérer le joueur " + p.getName() + " dans la base de donnée !");
+            GCore.getInstance().getLogger().severe("Impossible de récupérer le joueur " + p.getName() + " dans la base de donnée !");
         } else {
             User u = userByUUID.get(p.getUniqueId());
             long lastTimeLeave = (new Date()).getTime();
@@ -107,7 +110,7 @@ public class UserTable extends BaseDataTable {
                     userByUUID.put(u.getUuid(), u);
                     userByName.put(u.getName(), u);
                 }
-                default -> Bukkit.getLogger().severe("On essaye de changer une donnée inchangeable !");
+                default -> GCore.getInstance().getLogger().severe("On essaye de changer une donnée inchangeable !");
             }
         });
 
@@ -127,15 +130,13 @@ public class UserTable extends BaseDataTable {
     public void addUserToDB(User u){
         userByName.put(u.name, u);
         userByUUID.put(u.uuid, u);
-        CompletableFuture.runAsync(()->{
-            databasesManager.addData(tableName, ImmutableMap.<ColumnIdentifier, String>builder()
-                    .put(ColumnsNames.UUID, u.getUuid().toString())
-                    .put(ColumnsNames.PSEUDO, u.getName())
-                    .put(ColumnsNames.FIRSTJOINTIME, String.valueOf(u.getFirstJoinTime()))
-                    .put(ColumnsNames.LASTJOINTIME, String.valueOf(u.getLastJoinTime()))
-                    .put(ColumnsNames.LASTLEAVETIME, String.valueOf(u.getLastLeaveTime()))
-                    .build());
-        });
+        CompletableFuture.runAsync(()-> databasesManager.addData(tableName, ImmutableMap.<ColumnIdentifier, String>builder()
+                .put(ColumnsNames.UUID, u.getUuid().toString())
+                .put(ColumnsNames.PSEUDO, u.getName())
+                .put(ColumnsNames.FIRSTJOINTIME, String.valueOf(u.getFirstJoinTime()))
+                .put(ColumnsNames.LASTJOINTIME, String.valueOf(u.getLastJoinTime()))
+                .put(ColumnsNames.LASTLEAVETIME, String.valueOf(u.getLastLeaveTime()))
+                .build()));
     }
 
     public enum ColumnsNames implements ColumnIdentifier {
@@ -153,7 +154,7 @@ public class UserTable extends BaseDataTable {
     }
 
     @Getter
-    public class User {
+    public static class User {
         public User(){}
         public User(UUID uuid, String name, long firstJoinTime, long lastJoinTime){
             this.uuid = uuid;

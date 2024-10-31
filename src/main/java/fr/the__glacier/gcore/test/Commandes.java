@@ -5,14 +5,14 @@ import fr.the__glacier.gcore.database.UserTable;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandExecutor;
 import org.bukkit.command.CommandSender;
+import org.jetbrains.annotations.NotNull;
 
 import java.util.Calendar;
 import java.util.Date;
-import java.util.Map;
 
 public class Commandes implements CommandExecutor {
     @Override
-    public boolean onCommand(CommandSender sender, Command command, String alias, String[] args) {
+    public boolean onCommand(@NotNull CommandSender sender, @NotNull Command command, @NotNull String alias, String[] args) {
         if (args.length == 0) return false;
         String arg1 = args[0];
         if (arg1.equalsIgnoreCase("database")){

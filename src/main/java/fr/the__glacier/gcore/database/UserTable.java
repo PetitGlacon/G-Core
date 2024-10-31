@@ -50,7 +50,7 @@ public class UserTable extends BaseDataTable {
         GCore.getInstance().getLogger().warning("Data loaded from " + tableName);
     }
     public User getUser(String pseudo){
-        return userByName.get(pseudo);
+        return userByName.get(pseudo.toLowerCase());
     }
     public User getUser(Player p){
         return getUser(p.getUniqueId());
@@ -94,21 +94,21 @@ public class UserTable extends BaseDataTable {
             databasesManager.updateData(tableName, ColumnsNames.ID.getName(), String.valueOf(id), "=", column.getName(), value);
             switch (column) {
                 case PSEUDO -> {
-                    String name = u.getName();
+                    String name = u.getName().toLowerCase();
                     u.setName(value);
                     userByUUID.put(u.getUuid(), u);
-                    userByName.put(value, u);
+                    userByName.put(value.toLowerCase(), u);
                     userByName.remove(name);
                 }
                 case LASTJOINTIME -> {
                     u.setLastJoinTime(Long.parseLong(value));
                     userByUUID.put(u.getUuid(), u);
-                    userByName.put(u.getName(), u);
+                    userByName.put(u.getName().toLowerCase(), u);
                 }
                 case LASTLEAVETIME -> {
                     u.setLastLeaveTime(Long.parseLong(value));
                     userByUUID.put(u.getUuid(), u);
-                    userByName.put(u.getName(), u);
+                    userByName.put(u.getName().toLowerCase(), u);
                 }
                 default -> GCore.getInstance().getLogger().severe("On essaye de changer une donnée inchangeable !");
             }
@@ -123,12 +123,12 @@ public class UserTable extends BaseDataTable {
         return userByUUID.containsKey(p.getUniqueId());
     }
     public void addUserFromDB(User u){
-        userByName.put(u.name, u);
+        userByName.put(u.name.toLowerCase(), u);
         userByUUID.put(u.uuid, u);
     }
 
     public void addUserToDB(User u){
-        userByName.put(u.name, u);
+        userByName.put(u.name.toLowerCase(), u);
         userByUUID.put(u.uuid, u);
         CompletableFuture.runAsync(()-> databasesManager.addData(tableName, ImmutableMap.<ColumnIdentifier, String>builder()
                 .put(ColumnsNames.UUID, u.getUuid().toString())

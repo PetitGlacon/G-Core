@@ -59,7 +59,7 @@ public class DatabasesManager {
         String[] columns = columnsType.split("/");
         int nbColumns = columns.length;
         StringBuilder queryBuilder = new StringBuilder();
-        queryBuilder.append("REATE TABLE IF NOT EXISTS ").append(name).append(" (");
+        queryBuilder.append("CREATE TABLE IF NOT EXISTS ").append(name).append(" (");
         for (int i = 0; i<nbColumns; i++){
             if (i != 0) queryBuilder.append(",");
             String[] columnWithTypes = columns[i].split(":");

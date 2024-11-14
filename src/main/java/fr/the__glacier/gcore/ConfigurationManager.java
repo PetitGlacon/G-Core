@@ -126,14 +126,14 @@ public class ConfigurationManager {
      * @param instance The instance of the object which should be saved
      */
     public void save(Object instance) {
-        save(instance, getFile(instance));
+        saveFile(instance, getFile(instance));
     }
 
     public void save(Object instance, String path){
 
-        save(instance, getFile(path + getName(instance)));
+        saveFile(instance, getFile(path + getName(instance)));
     }
-    public void save(Object instance, String... folders){
+    public void saveWithFolders(Object instance,String name, String... folders){
         StringBuilder stringBuilder = new StringBuilder();
         for (String str : folders){
             stringBuilder.append(str);
@@ -145,13 +145,13 @@ public class ConfigurationManager {
             }
         }
         javaPlugin.getLogger().info(stringBuilder.substring(0, stringBuilder.length()));
-        save(instance, stringBuilder.substring(0, stringBuilder.length()));
+        save(instance, stringBuilder.substring(0, stringBuilder.length()), name);
     }
     public void save(Object instance, String path, String name){
 
-        save(instance, getFile(path + name));
+        saveFile(instance, getFile(path + name));
     }
-    public void save(String folderName, Object instance, String... folders){
+    public void saveWithFolder(String folderName, Object instance, String... folders){
         StringBuilder stringBuilder = new StringBuilder();
         for (String str : folders){
             stringBuilder.append(str);
@@ -172,7 +172,7 @@ public class ConfigurationManager {
      * @param instance The instance of the object which should be saved
      * @param file     The file where the object should be persisted to
      */
-    private void save(Object instance, File file) {
+    public void saveFile(Object instance, File file) {
         try {
             objectMapper.writeValue(file, instance);
         } catch (IOException e) {
@@ -247,6 +247,7 @@ public class ConfigurationManager {
                                     + javaPlugin.getDataFolder().getName() + File.separator + "backups: "
                                     + exception.getMessage());
                     Bukkit.getPluginManager().disablePlugin(javaPlugin);
+                    javaPlugin.getLogger().severe(e.getMessage());
                 }
                 load(clazz, file);
             }
@@ -265,7 +266,7 @@ public class ConfigurationManager {
         Date date = new Date();
         calendar.setTime(date);
         String datevalue = calendar.get(Calendar.DAY_OF_MONTH) + "-" + calendar.get(Calendar.MONTH) + "-" + calendar.get(Calendar.YEAR) + "_" + calendar.get(Calendar.HOUR) + "h" + calendar.get(Calendar.MINUTE) + "m" + calendar.get(Calendar.SECOND) + "s";
-        return new File(backupFolder + File.separator + file.getPath() + File.separator + datevalue + file.getName());
+        return new File(backupFolder + File.separator + file.getPath().replace(".yml","") + "_" + datevalue + file.getName());
     }
 
     /**

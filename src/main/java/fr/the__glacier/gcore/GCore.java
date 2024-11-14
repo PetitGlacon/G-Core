@@ -1,5 +1,6 @@
 package fr.the__glacier.gcore;
 
+import fr.the__glacier.gcore.commands.GCoreUtils;
 import fr.the__glacier.gcore.commands.gcore.GCoreCommand;
 import fr.the__glacier.gcore.commands.gcore.GCoreCommandManager;
 import fr.the__glacier.gcore.config.Commands;
@@ -11,10 +12,15 @@ import fr.the__glacier.gcore.listener.PlayerLeaveListener;
 import fr.the__glacier.gcore.test.ConfigTest;
 import fr.the__glacier.gcore.test.Listeners;
 import de.tr7zw.changeme.nbtapi.NBT;
+import fr.the__glacier.gcore.util.PageMessages;
 import lombok.Getter;
 import org.bukkit.Bukkit;
 import org.bukkit.command.*;
 import org.bukkit.plugin.java.JavaPlugin;
+
+import java.util.HashMap;
+import java.util.Map;
+import java.util.UUID;
 
 @Getter
 public final class GCore extends JavaPlugin {
@@ -32,6 +38,8 @@ public final class GCore extends JavaPlugin {
 
     public int VERSION;
 
+    public final Map<UUID, PageMessages> pageMessagesMap = new HashMap<>();
+
     private ConfigTest configTest;
     private ConfigTest configTest2;
 
@@ -47,6 +55,7 @@ public final class GCore extends JavaPlugin {
         configurationManager = new ConfigurationManager(ConfigurationManager.PersistType.YAML, this);
         loadConfig();
         saveConfig();
+        configTest.load();
         this.databasesManager = new DatabasesManager(sql.SQLType, sql.host, sql.port, sql.dataBase, sql.userName, sql.password);
         loadTables();
         registerListeners();
@@ -67,8 +76,9 @@ public final class GCore extends JavaPlugin {
 
     public void registerCommands(){
         registerCommand("gcore", new GCoreCommand(this, new GCoreCommandManager(), commands.GCoreCMD));
+        registerCommand("gcoreutils", new GCoreUtils());
     }
-    private void registerCommand(String command, GCoreCommand gCoreCommand){
+    private void registerCommand(String command, CommandExecutor gCoreCommand){
         PluginCommand cmd = getServer().getPluginCommand(command);
         if (cmd == null){
             getLogger().severe(command + " is not a valid command !");
@@ -86,7 +96,7 @@ public final class GCore extends JavaPlugin {
 
     public void saveConfig(){
         configurationManager.save(configTest);
-        configurationManager.save(configTest2, "bonjour", "test", "test 2");
+        configurationManager.saveWithFolders(configTest2, "fichier", "bonjour", "test", "test 2");
         configurationManager.save(sql);
         configurationManager.save(commands);
     }

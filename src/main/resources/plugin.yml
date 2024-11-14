@@ -9,6 +9,9 @@ folia-supported: true
 commands:
   gcore:
     description: main plugin command
+  gcoreutils:
+    description: utilities command
+    usage: gcoreutils
   testCmd:
     desctiption: test cmd
     usage: False

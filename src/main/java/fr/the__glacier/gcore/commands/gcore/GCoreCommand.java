@@ -7,22 +7,23 @@ import fr.the__glacier.gcore.commands.utils.Commands;
 import fr.the__glacier.gcore.commands.utils.SubCommandInterface;
 import fr.the__glacier.gcore.commands.utils.SubCommandsManager;
 import fr.the__glacier.gcore.config.configObjects.CommandConfig;
+import fr.the__glacier.gcore.util.PageMessages;
+import fr.the__glacier.gcore.util.PlayerUtil;
 import fr.the__glacier.gcore.util.TimeUtil;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandSender;
+import org.bukkit.entity.Player;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import java.time.Duration;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
+import java.util.*;
 
 public class GCoreCommand extends Commands {
     TimeUtil.CooldownManager cooldownManager;
 
     public GCoreCommand(GCore plugin, SubCommandsManager cmdManager, CommandConfig command){
-        super(command, cmdManager, plugin);
+        super(plugin, cmdManager, command);
         registerSubCommands();
         if (this.command.cooldownInSeconds != 0){
             cooldownManager = new TimeUtil.CooldownManager();
@@ -40,6 +41,13 @@ public class GCoreCommand extends Commands {
                 sender.sendMessage("Tu es sous §4cooldown§r !");
                 sender.sendMessage("Il te reste " + TimeUtil.getDurationFormated(cooldownManager.timeUntilEndCooldown(sender)) + ".");
                 return true;
+            }
+        }
+        if (args.length == 0 && sender instanceof Player player){
+            PlayerUtil.sendMiniMessage(player, "<hover:show_text:'test'>test</hover>");
+            for (Map.Entry<UUID, PageMessages> entry : GCore.getInstance().pageMessagesMap.entrySet()){
+                entry.getValue().sendMessage(player, 1);
+                break;
             }
         }
         if (args.length > 0){

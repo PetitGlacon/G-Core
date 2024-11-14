@@ -21,7 +21,7 @@ public class Commands implements CommandExecutor, TabCompleter {
     public SubCommandsManager commandsManager;
     public Plugin plugin;
 
-    public Commands(CommandConfig command, SubCommandsManager commandsManager, Plugin plugin){
+    public Commands(Plugin plugin, SubCommandsManager commandsManager, CommandConfig command){
         this.command = command;
         this.commandsManager = commandsManager;
         this.plugin = plugin;
@@ -29,13 +29,13 @@ public class Commands implements CommandExecutor, TabCompleter {
 
 
     @Override
-    public boolean onCommand(@NotNull CommandSender sender, @NotNull Command command, @NotNull String label, @NotNull String[] args) {
+    public boolean onCommand(@NotNull CommandSender sender, @NotNull Command command, @NotNull String alias, @NotNull String[] args) {
         if (args.length > 0){
             String subCommand = args[0].toLowerCase();
             String[] listArgs = Arrays.copyOfRange(args, 1, args.length);
             SubCommandInterface subCommandInterface = commandsManager.getSubCommand(subCommand);
             if (subCommandInterface != null){
-                return subCommandInterface.onCommand(plugin, sender, command, label, listArgs);
+                return subCommandInterface.onCommand(plugin, sender, command, alias, listArgs);
             }
         }
         return false;

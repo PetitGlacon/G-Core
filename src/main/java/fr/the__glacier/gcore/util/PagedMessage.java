@@ -1,6 +1,5 @@
 package fr.the__glacier.gcore.util;
 
-import com.fasterxml.jackson.annotation.JsonIgnore;
 import fr.the__glacier.gcore.GCore;
 import lombok.Setter;
 import org.bukkit.entity.Player;
@@ -12,13 +11,13 @@ import java.util.Map;
 import java.util.UUID;
 import java.util.concurrent.CompletableFuture;
 
-public class PageMessages {
+public class PagedMessage {
     public List<List<String>> message;
     private final List<String> rawMessages;
     private final List<String> top;
     private final String bottom;
     private final BottomType bottomType;
-    private final Map<BottomTypePlaceholders, String> pageNumberPlaceholders;
+    private final Map<BottomTypePlaceholders, String> pagedNumberPlaceholders;
     private final int nbLines;
     @Setter
     private int page;
@@ -26,25 +25,25 @@ public class PageMessages {
     private final UUID uuid;
     private final Plugin plugin;
 
-    public PageMessages(){
+    public PagedMessage(){
         this.rawMessages = List.of("");
         setMessage(rawMessages, 10);
         this.top = List.of("<gold>--- Help ---");
         this.bottom = "<aqua> <-- previous </aqua><white>...</white><aqua> next --></aqua>";
-        this.bottomType = PageMessages.BottomType.previousAndNextButton;
-        this.pageNumberPlaceholders = null;
+        this.bottomType = PagedMessage.BottomType.previousAndNextButton;
+        this.pagedNumberPlaceholders = null;
         this.nbLines = 10;
         this.uuid = null;
         this.plugin = GCore.getInstance();
         this.page = 1;
         this.maxPage = this.message.size();
     }
-    public PageMessages(List<String> messages, List<String> top, String bottom, BottomType bottomType, Map<BottomTypePlaceholders, String> pageNumberPlaceholders, int nbLines, UUID uuid, Plugin plugin){
+    public PagedMessage(List<String> messages, List<String> top, String bottom, BottomType bottomType, Map<BottomTypePlaceholders, String> pagedNumberPlaceholders, int nbLines, UUID uuid, Plugin plugin){
         this.rawMessages = messages;
         this.top = top;
         this.bottom = bottom;
         this.bottomType = bottomType;
-        this.pageNumberPlaceholders = pageNumberPlaceholders;
+        this.pagedNumberPlaceholders = pagedNumberPlaceholders;
         this.nbLines = nbLines;
         this.uuid = uuid;
         this.plugin = plugin;
@@ -52,13 +51,13 @@ public class PageMessages {
         setMessage(messages, nbLines);
         this.maxPage = this.message.size();
     }
-    public PageMessages(List<List<String>> messages, List<String> top, String bottom, BottomType bottomType, Map<BottomTypePlaceholders, String> pageNumberPlaceholders, UUID uuid, Plugin plugin){
+    public PagedMessage(List<List<String>> messages, List<String> top, String bottom, BottomType bottomType, Map<BottomTypePlaceholders, String> pageNumberPlaceholders, UUID uuid, Plugin plugin){
         this.rawMessages = null;
         this.message = messages;
         this.top = top;
         this.bottom = bottom;
         this.bottomType = bottomType;
-        this.pageNumberPlaceholders = pageNumberPlaceholders;
+        this.pagedNumberPlaceholders = pageNumberPlaceholders;
         this.nbLines = 0;
         this.uuid = uuid;
         this.plugin = plugin;
@@ -119,100 +118,100 @@ public class PageMessages {
         } else if (bottomType == BottomType.pageNumber){
             String command = "/gcoreutils " + plugin.getName() + " " + uuid + " ";
             UUID uuid1 = UUID.randomUUID();
-            String clickEvent = "<click:run_command:'" + command + uuid1 + "'><hover:show_text:'<white>page " + uuid1 + "</white>'>";
+            String clickEvent = "<click:run_command:'" + command + uuid1 + "'><hover:show_text:'" + pagedNumberPlaceholders.get(BottomTypePlaceholders.hover).replace("%page%", uuid1.toString()) + "'>";
             String endEvent = "</hover></click>";
 
             StringBuilder bottom = new StringBuilder();
-            bottom.append(pageNumberPlaceholders.getOrDefault(BottomTypePlaceholders.prefix, "").replace("%page%", String.valueOf(page)).replace("%maxPage%", String.valueOf(maxPage)));
+            bottom.append(pagedNumberPlaceholders.getOrDefault(BottomTypePlaceholders.prefix, "").replace("%page%", String.valueOf(page)).replace("%maxPage%", String.valueOf(maxPage)));
             assert maxPage > 0;
             if (maxPage <= 10){
                 int i = 1;
                 while (i <= maxPage){
                     String clickEventReplaced = clickEvent.replace(uuid1.toString(), String.valueOf(i));
                     if (i == page){
-                        bottom.append(clickEventReplaced).append(pageNumberPlaceholders.getOrDefault(BottomTypePlaceholders.page, "%page%").replace("%page%", String.valueOf(i))).append(endEvent);
+                        bottom.append(clickEventReplaced).append(pagedNumberPlaceholders.getOrDefault(BottomTypePlaceholders.page, "%page%").replace("%page%", String.valueOf(i))).append(endEvent);
                     } else if (i == page-1){
-                        bottom.append(clickEventReplaced).append(pageNumberPlaceholders.getOrDefault(BottomTypePlaceholders.previousPage, "%page%").replace("%page%", String.valueOf(i))).append(endEvent);
+                        bottom.append(clickEventReplaced).append(pagedNumberPlaceholders.getOrDefault(BottomTypePlaceholders.previousPage, "%page%").replace("%page%", String.valueOf(i))).append(endEvent);
                     } else if (i == page+1){
-                        bottom.append(clickEventReplaced).append(pageNumberPlaceholders.getOrDefault(BottomTypePlaceholders.nextPage, "%page%").replace("%page%", String.valueOf(i))).append(endEvent);
+                        bottom.append(clickEventReplaced).append(pagedNumberPlaceholders.getOrDefault(BottomTypePlaceholders.nextPage, "%page%").replace("%page%", String.valueOf(i))).append(endEvent);
                     } else if (i < page){
-                        bottom.append(clickEventReplaced).append(pageNumberPlaceholders.getOrDefault(BottomTypePlaceholders.firstPages, "%page%").replace("%page%", String.valueOf(i))).append(endEvent);
+                        bottom.append(clickEventReplaced).append(pagedNumberPlaceholders.getOrDefault(BottomTypePlaceholders.firstPages, "%page%").replace("%page%", String.valueOf(i))).append(endEvent);
                     } else {
-                        bottom.append(clickEventReplaced).append(pageNumberPlaceholders.getOrDefault(BottomTypePlaceholders.lastPages, "%page%").replace("%page%", String.valueOf(i))).append(endEvent);
+                        bottom.append(clickEventReplaced).append(pagedNumberPlaceholders.getOrDefault(BottomTypePlaceholders.lastPages, "%page%").replace("%page%", String.valueOf(i))).append(endEvent);
                     }
                     if (i < maxPage){
-                        bottom.append(pageNumberPlaceholders.getOrDefault(BottomTypePlaceholders.separator, "/"));
+                        bottom.append(pagedNumberPlaceholders.getOrDefault(BottomTypePlaceholders.separator, "/"));
                     }
                     i ++;
                 }
             } else {
                 if (page >= 4){
                     bottom.append(clickEvent.replace(uuid1.toString(), "1"));
-                    bottom.append(pageNumberPlaceholders.getOrDefault(BottomTypePlaceholders.firstPages, "%page%").replace("%page%", "1"));
+                    bottom.append(pagedNumberPlaceholders.getOrDefault(BottomTypePlaceholders.firstPages, "%page%").replace("%page%", "1"));
                     bottom.append(endEvent);
-                    bottom.append(pageNumberPlaceholders.getOrDefault(BottomTypePlaceholders.separator, "/"));
+                    bottom.append(pagedNumberPlaceholders.getOrDefault(BottomTypePlaceholders.separator, "/"));
                 }
                 if (page >= 5){
                     bottom.append(clickEvent.replace(uuid1.toString(), "2"));
-                    bottom.append(pageNumberPlaceholders.getOrDefault(BottomTypePlaceholders.firstPages, "%page%").replace("%page%", "2"));
+                    bottom.append(pagedNumberPlaceholders.getOrDefault(BottomTypePlaceholders.firstPages, "%page%").replace("%page%", "2"));
                     bottom.append(endEvent);
                     if (page < 6){
-                        bottom.append(pageNumberPlaceholders.getOrDefault(BottomTypePlaceholders.separator, "/"));
+                        bottom.append(pagedNumberPlaceholders.getOrDefault(BottomTypePlaceholders.separator, "/"));
                     }
                 }
                 if (page >= 6){
-                    bottom.append(pageNumberPlaceholders.getOrDefault(BottomTypePlaceholders.bigSeparator, "<gray> ... </gray>"));
+                    bottom.append(pagedNumberPlaceholders.getOrDefault(BottomTypePlaceholders.bigSeparator, "<gray> ... </gray>"));
                 }
                 if (page > 2){
                     bottom.append(clickEvent.replace(uuid1.toString(), String.valueOf(page-2)));
-                    bottom.append(pageNumberPlaceholders.getOrDefault(BottomTypePlaceholders.previousPage, "%page%").replace("%page%", String.valueOf(page-2)));
+                    bottom.append(pagedNumberPlaceholders.getOrDefault(BottomTypePlaceholders.previousPage, "%page%").replace("%page%", String.valueOf(page-2)));
                     bottom.append(endEvent);
-                    bottom.append(pageNumberPlaceholders.getOrDefault(BottomTypePlaceholders.separator, "/"));
+                    bottom.append(pagedNumberPlaceholders.getOrDefault(BottomTypePlaceholders.separator, "/"));
                 }
                 if (page > 1){
                     bottom.append(clickEvent.replace(uuid1.toString(), String.valueOf(page-1)));
-                    bottom.append(pageNumberPlaceholders.getOrDefault(BottomTypePlaceholders.previousPage, "%page%").replace("%page%", String.valueOf(page-1)));
+                    bottom.append(pagedNumberPlaceholders.getOrDefault(BottomTypePlaceholders.previousPage, "%page%").replace("%page%", String.valueOf(page-1)));
                     bottom.append(endEvent);
-                    bottom.append(pageNumberPlaceholders.getOrDefault(BottomTypePlaceholders.separator, "/"));
+                    bottom.append(pagedNumberPlaceholders.getOrDefault(BottomTypePlaceholders.separator, "/"));
                 }
 
-                bottom.append(clickEvent.replace(uuid1.toString(), String.valueOf(page))).append(pageNumberPlaceholders.getOrDefault(BottomTypePlaceholders.page, "%page%").replace("%page%", String.valueOf(page)));
+                bottom.append(pagedNumberPlaceholders.getOrDefault(BottomTypePlaceholders.page, "%page%").replace("%page%", String.valueOf(page)));
                 if (page != maxPage){
-                    bottom.append(pageNumberPlaceholders.getOrDefault(BottomTypePlaceholders.separator, "/"));
+                    bottom.append(pagedNumberPlaceholders.getOrDefault(BottomTypePlaceholders.separator, "/"));
                 }
 
                 if (page <= maxPage-1){
                     bottom.append(clickEvent.replace(uuid1.toString(), String.valueOf(page+1)));
-                    bottom.append(pageNumberPlaceholders.getOrDefault(BottomTypePlaceholders.nextPage, "%page%").replace("%page%", String.valueOf(page+1)));
+                    bottom.append(pagedNumberPlaceholders.getOrDefault(BottomTypePlaceholders.nextPage, "%page%").replace("%page%", String.valueOf(page+1)));
                     bottom.append(endEvent);
                     if (page != maxPage -1){
-                        bottom.append(pageNumberPlaceholders.getOrDefault(BottomTypePlaceholders.separator, "/"));
+                        bottom.append(pagedNumberPlaceholders.getOrDefault(BottomTypePlaceholders.separator, "/"));
                     }
                 }
                 if (page <= maxPage-2){
                     bottom.append(clickEvent.replace(uuid1.toString(), String.valueOf(page+2)));
-                    bottom.append(pageNumberPlaceholders.getOrDefault(BottomTypePlaceholders.nextPage, "%page%").replace("%page%", String.valueOf(page+2)));
+                    bottom.append(pagedNumberPlaceholders.getOrDefault(BottomTypePlaceholders.nextPage, "%page%").replace("%page%", String.valueOf(page+2)));
                     bottom.append(endEvent);
                     if (page > maxPage-5 && page != maxPage -2){
-                        bottom.append(pageNumberPlaceholders.getOrDefault(BottomTypePlaceholders.separator, "/"));
+                        bottom.append(pagedNumberPlaceholders.getOrDefault(BottomTypePlaceholders.separator, "/"));
                     }
                 }
                 if (page <= maxPage-5){
-                    bottom.append(pageNumberPlaceholders.getOrDefault(BottomTypePlaceholders.bigSeparator, "<gray> ... </gray>"));
+                    bottom.append(pagedNumberPlaceholders.getOrDefault(BottomTypePlaceholders.bigSeparator, "<gray> ... </gray>"));
                 }
                 if (page <= maxPage-4){
                     bottom.append(clickEvent.replace(uuid1.toString(), String.valueOf(maxPage-1)));
-                    bottom.append(pageNumberPlaceholders.getOrDefault(BottomTypePlaceholders.lastPages, "%page%").replace("%page%", String.valueOf(maxPage-1)));
+                    bottom.append(pagedNumberPlaceholders.getOrDefault(BottomTypePlaceholders.lastPages, "%page%").replace("%page%", String.valueOf(maxPage-1)));
                     bottom.append(endEvent);
-                    bottom.append(pageNumberPlaceholders.getOrDefault(BottomTypePlaceholders.separator, "/"));
+                    bottom.append(pagedNumberPlaceholders.getOrDefault(BottomTypePlaceholders.separator, "/"));
                 }
                 if (page <= maxPage-3){
                     bottom.append(clickEvent.replace(uuid1.toString(), String.valueOf(maxPage)));
-                    bottom.append(pageNumberPlaceholders.getOrDefault(BottomTypePlaceholders.lastPages, "%page%").replace("%page%", String.valueOf(maxPage)));
+                    bottom.append(pagedNumberPlaceholders.getOrDefault(BottomTypePlaceholders.lastPages, "%page%").replace("%page%", String.valueOf(maxPage)));
                     bottom.append(endEvent);
                 }
             }
-            bottom.append(pageNumberPlaceholders.getOrDefault(BottomTypePlaceholders.suffix, "").replace("%page%", String.valueOf(page)).replace("%maxPage%", String.valueOf(maxPage)));
+            bottom.append(pagedNumberPlaceholders.getOrDefault(BottomTypePlaceholders.suffix, "").replace("%page%", String.valueOf(page)).replace("%maxPage%", String.valueOf(maxPage)));
             return bottom.toString();
         }
         return null;
@@ -221,11 +220,11 @@ public class PageMessages {
         return str.replace("%page%", String.valueOf(page)).replace("%max_page%", String.valueOf(maxPage));
     }
 
-    public static enum BottomType{
+    public enum BottomType{
         previousAndNextButton,
         pageNumber
     }
-    public static enum BottomTypePlaceholders{
+    public enum BottomTypePlaceholders{
         page,
         firstPages,
         lastPages,
@@ -233,6 +232,7 @@ public class PageMessages {
         nextPage,
         separator,
         bigSeparator,
+        hover,
         prefix,
         suffix
     }

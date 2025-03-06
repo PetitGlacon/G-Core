@@ -1,77 +1,44 @@
 package fr.the__glacier.gcore.commands.gcore;
 
 import fr.the__glacier.gcore.GCore;
-import fr.the__glacier.gcore.color.MiniMessages;
 import fr.the__glacier.gcore.commands.gcore.subcmd.Databases;
 import fr.the__glacier.gcore.commands.utils.Commands;
 import fr.the__glacier.gcore.commands.utils.SubCommandInterface;
 import fr.the__glacier.gcore.commands.utils.SubCommandsManager;
 import fr.the__glacier.gcore.config.configObjects.CommandConfig;
-import fr.the__glacier.gcore.util.PageMessages;
+import fr.the__glacier.gcore.util.PagedMessage;
 import fr.the__glacier.gcore.util.PlayerUtil;
-import fr.the__glacier.gcore.util.TimeUtil;
+
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
-import java.time.Duration;
 import java.util.*;
 
 public class GCoreCommand extends Commands {
-    TimeUtil.CooldownManager cooldownManager;
 
     public GCoreCommand(GCore plugin, SubCommandsManager cmdManager, CommandConfig command){
         super(plugin, cmdManager, command);
         registerSubCommands();
-        if (this.command.cooldownInSeconds != 0){
-            cooldownManager = new TimeUtil.CooldownManager();
-        }
     }
 
     @Override
-    public boolean onCommand(@NotNull CommandSender sender, @NotNull Command command, @NotNull String label, @NotNull String[] args) {
-        if (!sender.hasPermission(getCommand().permission)) {
-            sender.sendMessage(new MiniMessages(getCommand().noPermission).getComponent());
-            return true;
-        }
-        if (cooldownManager != null){
-            if (cooldownManager.isOnCooldown(sender)){
-                sender.sendMessage("Tu es sous §4cooldown§r !");
-                sender.sendMessage("Il te reste " + TimeUtil.getDurationFormated(cooldownManager.timeUntilEndCooldown(sender)) + ".");
-                return true;
-            }
-        }
+    public boolean onCommand(@NotNull CommandSender sender, @NotNull Command command, @NotNull String label, @NotNull String @NotNull [] args) {
+        boolean b = super.onCommand(sender, command, label, args);
         if (args.length == 0 && sender instanceof Player player){
             PlayerUtil.sendMiniMessage(player, "<hover:show_text:'test'>test</hover>");
-            for (Map.Entry<UUID, PageMessages> entry : GCore.getInstance().pageMessagesMap.entrySet()){
+            for (Map.Entry<UUID, PagedMessage> entry : GCore.getInstance().pagedMessagesMap.entrySet()){
                 entry.getValue().sendMessage(player, 1);
                 break;
             }
         }
-        if (args.length > 0){
-            String subCommand = args[0].trim().toLowerCase();
-            String[] listArgs = Arrays.copyOfRange(args, 1, args.length);
-            SubCommandInterface subCommandInterface = commandsManager.getSubCommand(subCommand);
-            if (subCommandInterface != null){
-                if (!sender.hasPermission(subCommandInterface.getSubCommandConfig().permission)){
-                    sender.sendMessage(new MiniMessages(subCommandInterface.getSubCommandConfig().noPermission).getComponent());
-                    return true;
-                }
-                boolean result = subCommandInterface.onCommand(plugin, sender, command, label, listArgs);
-                if (result){
-                    if (cooldownManager != null) cooldownManager.addCooldown(sender, Duration.ofSeconds(this.command.cooldownInSeconds).toMillis());
-                }
-                return true;
-            }
-        }
-        sender.sendMessage(new MiniMessages(this.command.syntax).getComponent());
-        return true;
+        return b;
     }
 
     @Override
-    public @Nullable List<String> onTabComplete(@NotNull CommandSender sender, @NotNull Command command, @NotNull String label, @NotNull String[] args) {
+    public @Nullable List<String> onTabComplete(@NotNull CommandSender sender, @NotNull Command command, @NotNull String label, @NotNull String @NotNull [] args) {
         List<String> tab = new ArrayList<>();
         if (args.length == 1){
             tab.addAll(commandsManager.getCommandMap().keySet());

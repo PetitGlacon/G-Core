@@ -72,6 +72,7 @@ public class Databases implements SubCommandInterface {
         sender.sendMessage(new MiniMessages(subCommandConfig.syntax).getComponent());
         return false;
     }
+
     public void sendSyntax(CommandSender sender){
         PlayerUtil.sendMiniMessage(sender, subCommandConfig.syntax);
     }

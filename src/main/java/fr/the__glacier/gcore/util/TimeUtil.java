@@ -1,5 +1,7 @@
 package fr.the__glacier.gcore.util;
 
+import lombok.Getter;
+import lombok.Setter;
 import org.bukkit.entity.Entity;
 import org.jetbrains.annotations.NotNull;
 
@@ -119,6 +121,13 @@ public class TimeUtil {
 
     public static class CooldownManager {
         public Map<Object, Long> cooldownMap = new HashMap<>();
+        @Setter
+        @Getter
+        long duration;
+
+        public CooldownManager(long time){
+            this.duration = time;
+        }
         public boolean isOnCooldown(@NotNull Object o){
             if (o instanceof Entity){
                 return isOnCooldown(((Entity) o).getUniqueId());
@@ -140,13 +149,13 @@ public class TimeUtil {
             if (!cooldownMap.containsKey(o)) return 0L;
             return cooldownMap.get(o) - System.currentTimeMillis();
         }
-        public void addCooldown(Object o, long duration){
+        public void addCooldown(Object o){
             if (o instanceof Entity e) {
-                addCooldown(e.getUniqueId(), duration);
+                addCooldown(e.getUniqueId());
                 return;
             }
             if (isOnCooldown(o)) return;
-            cooldownMap.put(o, duration + System.currentTimeMillis());
+            cooldownMap.put(o, this.duration + System.currentTimeMillis());
         }
     }
 }

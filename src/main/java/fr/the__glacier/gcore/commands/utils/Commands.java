@@ -1,6 +1,8 @@
 package fr.the__glacier.gcore.commands.utils;
 
+import fr.the__glacier.gcore.color.MiniMessages;
 import fr.the__glacier.gcore.config.configObjects.CommandConfig;
+import fr.the__glacier.gcore.util.TimeUtil;
 import lombok.Getter;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandExecutor;
@@ -10,9 +12,7 @@ import org.bukkit.plugin.Plugin;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
+import java.util.*;
 
 public class Commands implements CommandExecutor, TabCompleter {
     @Getter
@@ -20,29 +20,37 @@ public class Commands implements CommandExecutor, TabCompleter {
     @Getter
     public SubCommandsManager commandsManager;
     public Plugin plugin;
+    public TimeUtil.CooldownManager cooldownManager;
 
     public Commands(Plugin plugin, SubCommandsManager commandsManager, CommandConfig command){
         this.command = command;
         this.commandsManager = commandsManager;
         this.plugin = plugin;
+        if (this.command.cooldownInSeconds != 0){
+            this.cooldownManager = new TimeUtil.CooldownManager(this.command.cooldownInSeconds);
+        }
     }
 
 
     @Override
-    public boolean onCommand(@NotNull CommandSender sender, @NotNull Command command, @NotNull String alias, @NotNull String[] args) {
-        if (args.length > 0){
-            String subCommand = args[0].toLowerCase();
-            String[] listArgs = Arrays.copyOfRange(args, 1, args.length);
-            SubCommandInterface subCommandInterface = commandsManager.getSubCommand(subCommand);
-            if (subCommandInterface != null){
-                return subCommandInterface.onCommand(plugin, sender, command, alias, listArgs);
+    public boolean onCommand(@NotNull CommandSender sender, @NotNull Command command, @NotNull String alias, @NotNull String @NotNull [] args) {
+        if (!checkPermission(sender)){
+            sender.sendMessage(new MiniMessages(getCommand().noPermission).getComponent());
+        }else if (checkCooldown(sender)){
+            sender.sendMessage(new MiniMessages(getCommand().isOnCooldown.replace("%time%", TimeUtil.getDurationFormated(cooldownManager.timeUntilEndCooldown(sender)))).getComponent());
+        } else {
+            boolean b = executeSubCommand(sender, command, alias, args);
+            if (!b) {
+                sender.sendMessage(new MiniMessages(getCommand().syntax).getComponent());
+            } else if (cooldownManager != null) {
+                cooldownManager.addCooldown(sender);
             }
         }
-        return false;
+        return true;
     }
 
     @Override
-    public @Nullable List<String> onTabComplete(@NotNull CommandSender sender, @NotNull Command command, @NotNull String label, @NotNull String[] args) {
+    public @Nullable List<String> onTabComplete(@NotNull CommandSender sender, @NotNull Command command, @NotNull String label, @NotNull String @NotNull [] args) {
         List<String> tab = new ArrayList<>();
         if (args.length == 1){
             String var1 = args[0];
@@ -55,5 +63,23 @@ public class Commands implements CommandExecutor, TabCompleter {
             }
         }
         return tab;
+    }
+    public boolean checkPermission(CommandSender sender){return sender.hasPermission(getCommand().permission);}
+    public boolean checkCooldown(CommandSender sender) {if (cooldownManager == null) return false; return cooldownManager.isOnCooldown(sender);}
+    public boolean executeSubCommand(CommandSender sender, Command command, String alias, String[] args){
+        boolean b = false;
+        if (args.length > 0){
+            String subCommand = args[0].toLowerCase();
+            String[] listArgs = Arrays.copyOfRange(args, 1, args.length);
+            SubCommandInterface subCommandInterface = commandsManager.getSubCommand(subCommand);
+            if (subCommandInterface != null){
+                if (!sender.hasPermission(subCommandInterface.getSubCommandConfig().permission)){
+                    sender.sendMessage(new MiniMessages(subCommandInterface.getSubCommandConfig().noPermission).getComponent());
+                } else {
+                    b = subCommandInterface.onCommand(plugin, sender, command, alias, listArgs);
+                }
+            }
+        }
+        return b;
     }
 }

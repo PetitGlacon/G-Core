@@ -10,9 +10,11 @@ import java.util.Map;
 public class Commands {
     public CommandConfig GCoreCMD;
     public String noPermission;
+    public String isOnCooldown;
 
     public Commands(){
         noPermission = "You don't have permission to do that !";
+        isOnCooldown = "You cannot use this now ! Try again in %time%.";
         Map<String, SubCommandConfig> map = ImmutableMap.of(
                 "database", new SubCommandConfig(
                         List.of("database", "databases", "db"),
@@ -23,7 +25,7 @@ public class Commands {
                         0L,
                         true)
         );
-        GCoreCMD = new CommandConfig("A test command", "/testCmd", "permission", noPermission, 0L, true, map);
+        GCoreCMD = new CommandConfig("A test command", "/testCmd", "permission", noPermission, 0L, isOnCooldown,true,map);
     }
 
 }

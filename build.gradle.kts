@@ -20,12 +20,11 @@ dependencies {
     // compileOnly("lien") -> ajoute un projet en dépendance (pas inclu dans le jar final)
     implementation("com.fasterxml.jackson.core:jackson-core:2.15.3")
     implementation("com.fasterxml.jackson.dataformat:jackson-dataformat-yaml:2.15.3")
-    implementation("de.tr7zw:item-nbt-api:2.13.2")
+    implementation("de.tr7zw:item-nbt-api:2.14.1")
 
 
     compileOnly("org.projectlombok:lombok:1.18.30")
-    compileOnly("io.papermc.paper:paper-api:1.21.1-R0.1-SNAPSHOT")
-
+    compileOnly("io.papermc.paper:paper-api:1.21.4-R0.1-SNAPSHOT")
 
     annotationProcessor("org.projectlombok:lombok:1.18.30")
 }

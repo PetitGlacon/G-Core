@@ -11,24 +11,27 @@ public class CommandConfig {
         permission = "";
         noPermission = "";
         cooldownInSeconds = 0;
+        isOnCooldown = "";
         enabled = false;
         subCommands = null;
     }
-    public CommandConfig(String description, String syntax, String permission, String noPermission, Long cooldownInSeconds, boolean enabled, @Nullable Map<String,SubCommandConfig> subCommands){
+    public CommandConfig(String description, String syntax, String permission, String noPermission, Long cooldownInSeconds, String isOnCooldown, boolean enabled, @Nullable Map<String,SubCommandConfig> subCommands){
         this.description = description;
         this.syntax = syntax;
         this.permission = permission;
         this.noPermission = noPermission;
         this.cooldownInSeconds = cooldownInSeconds;
+        this.isOnCooldown = isOnCooldown;
         this.enabled = enabled;
         this.subCommands = subCommands;
     }
-    public CommandConfig(String description, String syntax, String permission, String noPermission, Long cooldownInSeconds, boolean enabled){
+    public CommandConfig(String description, String syntax, String permission, String noPermission, Long cooldownInSeconds, String isOnCooldown, boolean enabled){
         this.description = description;
         this.syntax = syntax;
         this.permission = permission;
         this.noPermission = noPermission;
         this.cooldownInSeconds = cooldownInSeconds;
+        this.isOnCooldown = isOnCooldown;
         this.enabled = enabled;
         this.subCommands = null;
     }
@@ -38,6 +41,7 @@ public class CommandConfig {
     public String permission;
     public String noPermission;
     public long cooldownInSeconds;
+    public String isOnCooldown;
     public boolean enabled;
     @Nullable
     public Map<String,SubCommandConfig> subCommands;

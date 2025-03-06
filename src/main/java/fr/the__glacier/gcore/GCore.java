@@ -2,7 +2,7 @@ package fr.the__glacier.gcore;
 
 import fr.the__glacier.gcore.commands.GCoreUtils;
 import fr.the__glacier.gcore.commands.gcore.GCoreCommand;
-import fr.the__glacier.gcore.commands.gcore.GCoreCommandManager;
+import fr.the__glacier.gcore.commands.utils.SubCommandsManager;
 import fr.the__glacier.gcore.config.Commands;
 import fr.the__glacier.gcore.config.SQL;
 import fr.the__glacier.gcore.database.DatabasesManager;
@@ -12,7 +12,7 @@ import fr.the__glacier.gcore.listener.PlayerLeaveListener;
 import fr.the__glacier.gcore.test.ConfigTest;
 import fr.the__glacier.gcore.test.Listeners;
 import de.tr7zw.changeme.nbtapi.NBT;
-import fr.the__glacier.gcore.util.PageMessages;
+import fr.the__glacier.gcore.util.PagedMessage;
 import lombok.Getter;
 import org.bukkit.Bukkit;
 import org.bukkit.command.*;
@@ -38,7 +38,7 @@ public final class GCore extends JavaPlugin {
 
     public int VERSION;
 
-    public final Map<UUID, PageMessages> pageMessagesMap = new HashMap<>();
+    public final Map<UUID, PagedMessage> pagedMessagesMap = new HashMap<>();
 
     private ConfigTest configTest;
     private ConfigTest configTest2;
@@ -59,7 +59,7 @@ public final class GCore extends JavaPlugin {
         this.databasesManager = new DatabasesManager(sql.SQLType, sql.host, sql.port, sql.dataBase, sql.userName, sql.password);
         loadTables();
         registerListeners();
-        Test();
+        //Test();
         registerCommands();
 
     }
@@ -75,7 +75,7 @@ public final class GCore extends JavaPlugin {
     }
 
     public void registerCommands(){
-        registerCommand("gcore", new GCoreCommand(this, new GCoreCommandManager(), commands.GCoreCMD));
+        registerCommand("gcore", new GCoreCommand(this, new SubCommandsManager(), commands.GCoreCMD));
         registerCommand("gcoreutils", new GCoreUtils());
     }
     private void registerCommand(String command, CommandExecutor gCoreCommand){

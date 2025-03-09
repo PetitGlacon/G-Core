@@ -10,6 +10,7 @@ import org.bukkit.event.inventory.BrewEvent;
 import org.bukkit.event.player.PlayerCommandSendEvent;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.PotionMeta;
+import org.bukkit.plugin.messaging.PluginMessageListener;
 
 import java.util.Objects;
 import java.util.stream.Stream;

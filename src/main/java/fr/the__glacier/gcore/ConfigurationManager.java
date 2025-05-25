@@ -249,7 +249,7 @@ public class ConfigurationManager {
                     Bukkit.getPluginManager().disablePlugin(javaPlugin);
                     javaPlugin.getLogger().severe(e.getMessage());
                 }
-                load(clazz, file);
+                // load(clazz, file);
             }
         }
 
@@ -261,12 +261,12 @@ public class ConfigurationManager {
         return null;
     }
 
-    private static File getBackUpFile(File file, File backupFolder) {
+    private File getBackUpFile(File file, File backupFolder) {
         Calendar calendar = Calendar.getInstance();
         Date date = new Date();
         calendar.setTime(date);
-        String datevalue = calendar.get(Calendar.DAY_OF_MONTH) + "-" + calendar.get(Calendar.MONTH) + "-" + calendar.get(Calendar.YEAR) + "_" + calendar.get(Calendar.HOUR) + "h" + calendar.get(Calendar.MINUTE) + "m" + calendar.get(Calendar.SECOND) + "s";
-        return new File(backupFolder + File.separator + file.getPath().replace(".yml","") + "_" + datevalue + file.getName());
+        String datevalue = calendar.get(Calendar.DAY_OF_MONTH) + "-" + calendar.get(Calendar.MONTH) + "-" + calendar.get(Calendar.YEAR) + "_" + calendar.get(Calendar.HOUR) + "h " + calendar.get(Calendar.MINUTE) + "m " + calendar.get(Calendar.SECOND) + "s";
+        return new File(backupFolder + File.separator + file.getName().replace(".yml","") + "_" + datevalue + persistType.getExtension());
     }
 
     /**

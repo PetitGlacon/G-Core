@@ -1,7 +1,8 @@
 plugins {
-    java
-    `maven-publish`
+    id("java")
+    id("maven-publish")
     id ("io.github.goooler.shadow") version "8.1.8"
+    id ("io.papermc.paperweight.userdev") version "2.0.0-beta.14"
 }
 
 group = "fr.The__Glacier"
@@ -16,6 +17,7 @@ repositories {
 }
 
 dependencies {
+    paperweight.foliaDevBundle("1.21.4-R0.1-SNAPSHOT")
     // implementation("lien") -> inclu le lien dans le projet
     // compileOnly("lien") -> ajoute un projet en dépendance (pas inclu dans le jar final)
     implementation("com.fasterxml.jackson.core:jackson-core:2.15.3")
@@ -24,7 +26,7 @@ dependencies {
 
 
     compileOnly("org.projectlombok:lombok:1.18.30")
-    compileOnly("io.papermc.paper:paper-api:1.21.4-R0.1-SNAPSHOT")
+    // compileOnly("io.papermc.paper:paper-api:1.21.4-R0.1-SNAPSHOT")
 
     annotationProcessor("org.projectlombok:lombok:1.18.30")
 }

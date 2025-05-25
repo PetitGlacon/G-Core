@@ -37,6 +37,7 @@ public final class GCore extends JavaPlugin {
 
 
     public int VERSION;
+    public boolean isFolia;
 
     public final Map<UUID, PagedMessage> pagedMessagesMap = new HashMap<>();
 
@@ -47,6 +48,7 @@ public final class GCore extends JavaPlugin {
     public void onEnable() {
         instance = this;
         VERSION = getVersion();
+        isFolia = folia();
         if (!NBT.preloadApi()){
             getLogger().warning("NBT-API wasn't initialized properly, disabling the plugin");
             Bukkit.getPluginManager().disablePlugin(this);
@@ -124,5 +126,14 @@ public final class GCore extends JavaPlugin {
             version = version.substring(0, lastDot);
         }
         return Integer.parseInt(version.substring(2));
+    }
+    public boolean folia(){
+        try {
+            // Folia a cette classe spécifique
+            Class.forName("io.papermc.paper.threadedregions.scheduler.RegionScheduler");
+            return true;
+        } catch (ClassNotFoundException e) {
+            return false; // Si la classe n'existe pas, on est sur Paper ou Spigot classique
+        }
     }
 }

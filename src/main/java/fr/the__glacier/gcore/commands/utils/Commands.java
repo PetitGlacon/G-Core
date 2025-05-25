@@ -52,14 +52,20 @@ public class Commands implements CommandExecutor, TabCompleter {
     @Override
     public @Nullable List<String> onTabComplete(@NotNull CommandSender sender, @NotNull Command command, @NotNull String label, @NotNull String @NotNull [] args) {
         List<String> tab = new ArrayList<>();
-        if (args.length == 1){
+        if (args.length == 0){
+            tab.addAll(commandsManager.getCommandMap().keySet());
+        } else if (args.length == 1){
             String var1 = args[0];
             tab.addAll(commandsManager.getCommandMap().keySet().stream().filter(key -> key.startsWith(var1)).toList());
         } else {
             String arg = args[0];
             SubCommandInterface subCommandInterface = commandsManager.getSubCommand(arg);
             if (subCommandInterface != null){
-                return subCommandInterface.onTabComplete(plugin, sender, command, label, Arrays.copyOfRange(args, 1, args.length));
+                String start = args[args.length -1];
+                List<String> list = subCommandInterface.onTabComplete(plugin, sender, command, label, Arrays.copyOfRange(args, 1, args.length));
+                if (list != null){
+                    tab.addAll(list.stream().filter(str -> str.startsWith(start)).toList());
+                }
             }
         }
         return tab;

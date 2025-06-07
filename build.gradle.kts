@@ -5,14 +5,14 @@ plugins {
     id ("io.papermc.paperweight.userdev") version "2.0.0-beta.14"
 }
 
-group = "fr.The__Glacier"
+group = "com.github"
 version = "1.0.0-SNAPSHOT-raw"
 
 repositories {
     mavenCentral()
     maven("https://repo.papermc.io/repository/maven-public/")
     maven("https://oss.sonatype.org/content/groups/public/" )
-    maven("https://https://repo1.maven.org/maven2/com/fasterxml/jackson/core/jackson-databind/")
+    maven("https://repo1.maven.org/maven2/com/fasterxml/jackson/core/jackson-databind/")
     maven("https://repo.codemc.io/repository/maven-public/")
 }
 

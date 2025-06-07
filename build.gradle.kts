@@ -5,7 +5,7 @@ plugins {
     id ("io.papermc.paperweight.userdev") version "2.0.0-beta.14"
 }
 
-group = "com.github"
+group = "fr.The__Glacier"
 version = "1.0.0-SNAPSHOT-raw"
 
 repositories {

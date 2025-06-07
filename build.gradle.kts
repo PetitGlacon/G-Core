@@ -9,6 +9,7 @@ group = "fr.The__Glacier"
 version = "1.0.0-SNAPSHOT-raw"
 
 repositories {
+    mavenLocal()
     mavenCentral()
     maven("https://repo.papermc.io/repository/maven-public/")
     maven("https://oss.sonatype.org/content/groups/public/" )
@@ -39,8 +40,7 @@ java {
 }
 tasks {
     jar {
-        dependsOn(shadowJar)
-        enabled = true
+        enabled = false
     }
 
     shadowJar {
@@ -54,5 +54,25 @@ tasks {
 
     compileJava {
         options.encoding = "UTF-8"
+    }
+}
+publishing {
+    publications {
+        create<MavenPublication>("mavenJava") {
+            // from(components["java"])
+
+            groupId = "fr.The__Glacier"
+            artifactId = "G-Core"
+            version = "1.0.0-SNAPSHOT"  // Version sans le suffixe '-raw'
+
+            // Associe la publication à l'artefact généré par shadowJar
+            artifact(tasks["shadowJar"]) {
+                classifier = ""  // Pas de classifier pour éviter des artefacts multiples
+            }
+        }
+    }
+
+    repositories {
+        mavenLocal()  // Publie l'artefact dans ton dépôt Maven local (~/.m2/repository)
     }
 }

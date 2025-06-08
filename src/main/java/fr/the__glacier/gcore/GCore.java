@@ -47,6 +47,7 @@ public final class GCore extends JavaPlugin {
     @Override
     public void onEnable() {
         instance = this;
+        getLogger().severe("true");
         VERSION = getVersion();
         isFolia = folia();
         if (!NBT.preloadApi()){
@@ -128,12 +129,14 @@ public final class GCore extends JavaPlugin {
         return Integer.parseInt(version.substring(2));
     }
     public boolean folia(){
+        return classExist("io.papermc.paper.threadedregions.scheduler.RegionScheduler");
+    }
+    public static boolean classExist(String string){
         try {
-            // Folia a cette classe spécifique
-            Class.forName("io.papermc.paper.threadedregions.scheduler.RegionScheduler");
+            Class.forName(string);
             return true;
-        } catch (ClassNotFoundException e) {
-            return false; // Si la classe n'existe pas, on est sur Paper ou Spigot classique
+        } catch (ClassNotFoundException e){
+            return false;
         }
     }
 }

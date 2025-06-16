@@ -60,7 +60,7 @@ public class Commands implements CommandExecutor, TabCompleter {
         } else {
             String arg = args[0];
             SubCommandInterface subCommandInterface = commandsManager.getSubCommand(arg);
-            if (subCommandInterface != null){
+            if (subCommandInterface != null && sender.hasPermission(subCommandInterface.getSubCommandConfig().permission)){
                 String start = args[args.length -1];
                 List<String> list = subCommandInterface.onTabComplete(plugin, sender, command, label, Arrays.copyOfRange(args, 1, args.length));
                 if (list != null){

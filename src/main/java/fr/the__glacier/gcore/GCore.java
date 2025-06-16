@@ -37,7 +37,7 @@ public final class GCore extends JavaPlugin {
 
 
     public int VERSION;
-    public boolean isFolia;
+    public boolean isFolia = folia();
 
     public final Map<UUID, PagedMessage> pagedMessagesMap = new HashMap<>();
 

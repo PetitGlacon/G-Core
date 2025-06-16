@@ -6,6 +6,7 @@ prefix: G-Core
 authors: [ The__Glacier ]
 description: A minecraft core plugin for other G- plugins
 folia-supported: true
+load: STARTUP
 commands:
   gcore:
     description: main plugin command

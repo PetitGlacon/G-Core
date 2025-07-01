@@ -12,9 +12,9 @@ public abstract class SubCommand {
     public TimeUtil.CooldownManager mainCooldownManager;
     private final TimeUtil.CooldownManager cooldownManager;
 
-    public SubCommand(SubCommandConfig config, TimeUtil.CooldownManager mainCooldDownManager){
+    public SubCommand(SubCommandConfig config, TimeUtil.CooldownManager mainCooldownManager){
         this.config = config;
-        this.mainCooldownManager = mainCooldDownManager;
+        this.mainCooldownManager = mainCooldownManager;
         if (config.cooldownInSeconds > 0){
             this.cooldownManager = new TimeUtil.CooldownManager(config.cooldownInSeconds);
         } else {
@@ -37,7 +37,7 @@ public abstract class SubCommand {
         }
     }
 
-    public abstract LiteralArgumentBuilder<CommandSourceStack> getCommand();
+    public abstract LiteralArgumentBuilder<CommandSourceStack> getCommand(String alias);
 
     public SubCommandConfig getSubCommandConfig(){
         return this.config;

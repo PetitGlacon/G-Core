@@ -1,7 +1,9 @@
 package fr.the__glacier.gcore.commands.brigadier;
 
 import com.mojang.brigadier.builder.LiteralArgumentBuilder;
+import fr.the__glacier.gcore.commands.utils.SubCommandInterface;
 import fr.the__glacier.gcore.config.configObjects.CommandConfig;
+import fr.the__glacier.gcore.config.configObjects.SubCommandConfig;
 import fr.the__glacier.gcore.util.TimeUtil;
 import io.papermc.paper.command.brigadier.CommandSourceStack;
 import io.papermc.paper.command.brigadier.Commands;
@@ -29,24 +31,18 @@ public class BrigadierCommands {
         if (this.commandConfig.cooldownInSeconds != 0){
             this.cooldownManager = new TimeUtil.CooldownManager(this.commandConfig.cooldownInSeconds);
         }
-        registerCommand();
     }
 
-    private void registerCommand(){
+    public void registerCommand(){
         command = Commands.literal(this.commandConfig.name).requires(sender -> checkPermission(sender.getSender()));
         if (commandsManager == null) return;
         Map<String, SubCommand> map = commandsManager.getCommandMap();
         if (map == null) return;
-        for (SubCommand subCommandInterface : map.values()){
-            LiteralArgumentBuilder<CommandSourceStack> child = subCommandInterface.getCommand();
+        for (Map.Entry<String, SubCommand> entry : map.entrySet()){
+            LiteralArgumentBuilder<CommandSourceStack> child = entry.getValue().getCommand(entry.getKey());
             assert this.command != null;
             this.command.then(child);
         }
-    }
-
-    public void addSubCommand(SubCommand subCommandInterface){
-        LiteralArgumentBuilder<CommandSourceStack> child = subCommandInterface.getCommand();
-        this.command.then(child);
     }
 
     public boolean checkPermission(CommandSender sender){return sender.hasPermission(getCommandConfig().permission);}

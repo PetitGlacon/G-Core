@@ -22,7 +22,8 @@ public class BrigadierCommands {
     public Plugin plugin;
     public TimeUtil.CooldownManager cooldownManager;
 
-    private LiteralArgumentBuilder<CommandSourceStack> command;
+    @Getter
+    public LiteralArgumentBuilder<CommandSourceStack> command;
 
     public BrigadierCommands(Plugin plugin, SubCommandsManager commandsManager, CommandConfig command){
         this.commandConfig = command;

@@ -3,6 +3,7 @@ package fr.the__glacier.gcore.config.configObjects;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.Map;
+import java.util.Set;
 
 public class CommandConfig {
     public CommandConfig(){
@@ -35,7 +36,19 @@ public class CommandConfig {
         this.enabled = enabled;
         this.subCommands = null;
     }
+    public CommandConfig(String name, String description, String syntax, String permission, String noPermission, Long cooldownInSeconds, String isOnCooldown, boolean enabled, @Nullable Map<String,SubCommandConfig> subCommands){
+        this.name = name;
+        this.description = description;
+        this.syntax = syntax;
+        this.permission = permission;
+        this.noPermission = noPermission;
+        this.cooldownInSeconds = cooldownInSeconds;
+        this.isOnCooldown = isOnCooldown;
+        this.enabled = enabled;
+        this.subCommands = subCommands;
+    }
 
+    public String name;
     public String description;
     public String syntax;
     public String permission;

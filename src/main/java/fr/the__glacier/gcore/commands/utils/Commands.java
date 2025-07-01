@@ -64,7 +64,7 @@ public class Commands implements CommandExecutor, TabCompleter {
                 String start = args[args.length -1];
                 List<String> list = subCommandInterface.onTabComplete(plugin, sender, command, label, Arrays.copyOfRange(args, 1, args.length));
                 if (list != null){
-                    tab.addAll(list.stream().filter(str -> str.startsWith(start)).toList());
+                    tab.addAll(list.stream().filter(str -> str != null && str.startsWith(start)).toList());
                 }
             }
         }

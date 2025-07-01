@@ -1,0 +1,53 @@
+package fr.the__glacier.gcore.commands.brigadier;
+
+import com.mojang.brigadier.builder.LiteralArgumentBuilder;
+import fr.the__glacier.gcore.config.configObjects.CommandConfig;
+import fr.the__glacier.gcore.util.TimeUtil;
+import io.papermc.paper.command.brigadier.CommandSourceStack;
+import io.papermc.paper.command.brigadier.Commands;
+import lombok.Getter;
+import org.bukkit.command.CommandSender;
+import org.bukkit.plugin.Plugin;
+
+import java.util.*;
+
+@SuppressWarnings("UnstableApiUsage")
+public class BrigadierCommands {
+    @Getter
+    public CommandConfig commandConfig;
+    @Getter
+    public SubCommandsManager commandsManager;
+    public Plugin plugin;
+    public TimeUtil.CooldownManager cooldownManager;
+
+    private LiteralArgumentBuilder<CommandSourceStack> command;
+
+    public BrigadierCommands(Plugin plugin, SubCommandsManager commandsManager, CommandConfig command){
+        this.commandConfig = command;
+        this.commandsManager = commandsManager;
+        this.plugin = plugin;
+        if (this.commandConfig.cooldownInSeconds != 0){
+            this.cooldownManager = new TimeUtil.CooldownManager(this.commandConfig.cooldownInSeconds);
+        }
+        registerCommand();
+    }
+
+    private void registerCommand(){
+        command = Commands.literal(this.commandConfig.name).requires(sender -> checkPermission(sender.getSender()));
+        if (commandsManager == null) return;
+        Map<String, SubCommand> map = commandsManager.getCommandMap();
+        if (map == null) return;
+        for (SubCommand subCommandInterface : map.values()){
+            LiteralArgumentBuilder<CommandSourceStack> child = subCommandInterface.getCommand();
+            assert this.command != null;
+            this.command.then(child);
+        }
+    }
+
+    public void addSubCommand(SubCommand subCommandInterface){
+        LiteralArgumentBuilder<CommandSourceStack> child = subCommandInterface.getCommand();
+        this.command.then(child);
+    }
+
+    public boolean checkPermission(CommandSender sender){return sender.hasPermission(getCommandConfig().permission);}
+}

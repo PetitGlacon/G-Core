@@ -77,9 +77,9 @@ public class SchedulerUtil {
     public static void runTask(Plugin plugin, Runnable task, Location location){
         if (isFolia){
             if (location == null){
-                plugin.getServer().getGlobalRegionScheduler().run(plugin, foliaTask -> task.run());
+                plugin.getServer().getGlobalRegionScheduler().execute(plugin, task);
             } else {
-                plugin.getServer().getRegionScheduler().run(plugin, location, foliaTask -> task.run());
+                plugin.getServer().getRegionScheduler().execute(plugin, location, task);
             }
         } else {
             Bukkit.getScheduler().runTask(plugin, task);

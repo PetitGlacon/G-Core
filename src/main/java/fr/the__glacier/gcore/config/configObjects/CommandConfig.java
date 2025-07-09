@@ -17,6 +17,7 @@ public class CommandConfig {
         subCommands = null;
     }
     public CommandConfig(String description, String syntax, String permission, String noPermission, Long cooldownInSeconds, String isOnCooldown, boolean enabled, @Nullable Map<String,SubCommandConfig> subCommands){
+        this.name = "cmd";
         this.description = description;
         this.syntax = syntax;
         this.permission = permission;
@@ -27,6 +28,7 @@ public class CommandConfig {
         this.subCommands = subCommands;
     }
     public CommandConfig(String description, String syntax, String permission, String noPermission, Long cooldownInSeconds, String isOnCooldown, boolean enabled){
+        this.name = "cmd";
         this.description = description;
         this.syntax = syntax;
         this.permission = permission;

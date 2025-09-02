@@ -1,26 +1,25 @@
 package fr.the__glacier.gcore;
 
 import fr.the__glacier.gcore.commands.GCoreUtils;
-import fr.the__glacier.gcore.commands.gcore.GCoreCommand;
+import fr.the__glacier.gcore.commands.utils.BrigadierCommands;
 import fr.the__glacier.gcore.commands.utils.SubCommandsManager;
+import fr.the__glacier.gcore.commands.gcore.GCoreCommand;
 import fr.the__glacier.gcore.config.Commands;
 import fr.the__glacier.gcore.config.SQL;
+import fr.the__glacier.gcore.config.configObjects.CommandConfig;
 import fr.the__glacier.gcore.database.DatabasesManager;
 import fr.the__glacier.gcore.database.UserTable;
+import fr.the__glacier.gcore.listener.CommandCompletionListener;
 import fr.the__glacier.gcore.listener.PlayerJoinListener;
 import fr.the__glacier.gcore.listener.PlayerLeaveListener;
 import fr.the__glacier.gcore.test.ConfigTest;
 import fr.the__glacier.gcore.test.Listeners;
 import de.tr7zw.changeme.nbtapi.NBT;
-import fr.the__glacier.gcore.util.PagedMessage;
+import fr.the__glacier.gcore.util.PagedMessageManager;
+import io.papermc.paper.plugin.lifecycle.event.types.LifecycleEvents;
 import lombok.Getter;
 import org.bukkit.Bukkit;
-import org.bukkit.command.*;
 import org.bukkit.plugin.java.JavaPlugin;
-
-import java.util.HashMap;
-import java.util.Map;
-import java.util.UUID;
 
 @Getter
 public final class GCore extends JavaPlugin {
@@ -37,9 +36,9 @@ public final class GCore extends JavaPlugin {
 
 
     public int VERSION;
-    public boolean isFolia = folia();
+    public static boolean isFolia = folia();
 
-    public final Map<UUID, PagedMessage> pagedMessagesMap = new HashMap<>();
+    public final PagedMessageManager pagedMessagesManager = new PagedMessageManager();
 
     private ConfigTest configTest;
     private ConfigTest configTest2;
@@ -49,7 +48,6 @@ public final class GCore extends JavaPlugin {
         instance = this;
         getLogger().severe("true");
         VERSION = getVersion();
-        isFolia = folia();
         if (!NBT.preloadApi()){
             getLogger().warning("NBT-API wasn't initialized properly, disabling the plugin");
             Bukkit.getPluginManager().disablePlugin(this);
@@ -78,16 +76,14 @@ public final class GCore extends JavaPlugin {
     }
 
     public void registerCommands(){
-        registerCommand("gcore", new GCoreCommand(this, new SubCommandsManager(), commands.GCoreCMD));
-        registerCommand("gcoreutils", new GCoreUtils());
+        registerCommand(new GCoreCommand(this, new SubCommandsManager(), commands.GCoreCMD));
+        registerCommand(new GCoreUtils(this, new SubCommandsManager(), new CommandConfig("gcoreutils")));
     }
-    private void registerCommand(String command, CommandExecutor gCoreCommand){
-        PluginCommand cmd = getServer().getPluginCommand(command);
-        if (cmd == null){
-            getLogger().severe(command + " is not a valid command !");
-        } else {
-            cmd.setExecutor(gCoreCommand);
-        }
+
+    public void registerCommand(BrigadierCommands command){
+        this.getLifecycleManager().registerEventHandler(LifecycleEvents.COMMANDS, commands -> {
+            commands.registrar().register(command.getCommand().build());
+        });
     }
 
     public void loadConfig(){
@@ -111,6 +107,7 @@ public final class GCore extends JavaPlugin {
     public void registerListeners(){
         Bukkit.getPluginManager().registerEvents(new PlayerJoinListener(), this);
         Bukkit.getPluginManager().registerEvents(new PlayerLeaveListener(), this);
+        Bukkit.getPluginManager().registerEvents(new CommandCompletionListener(), this);
     }
 
     private static int getVersion() {
@@ -128,7 +125,7 @@ public final class GCore extends JavaPlugin {
         }
         return Integer.parseInt(version.substring(2));
     }
-    public boolean folia(){
+    public static boolean folia(){
         return classExist("io.papermc.paper.threadedregions.scheduler.RegionScheduler");
     }
     public static boolean classExist(String string){

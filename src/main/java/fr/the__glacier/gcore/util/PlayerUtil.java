@@ -1,7 +1,6 @@
 package fr.the__glacier.gcore.util;
 
 
-import fr.the__glacier.gcore.color.ColorsUtil;
 import fr.the__glacier.gcore.color.MiniMessages;
 import net.kyori.adventure.text.Component;
 import org.bukkit.Bukkit;
@@ -11,9 +10,6 @@ import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 
 public class PlayerUtil {
-    public static void sendColoredMessage(Player p, String str){
-        p.sendMessage(ColorsUtil.color(str));
-    }
     public static void sendMiniMessage(CommandSender e, String str){
         MiniMessages msg = new MiniMessages(str);
         e.sendMessage(msg.getComponent());

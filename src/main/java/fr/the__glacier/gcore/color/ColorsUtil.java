@@ -10,6 +10,7 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.regex.Matcher;
 
+@Deprecated
 public class ColorsUtil {
     private static final List<ColorPatterns> PATTERNS;
     private static final List<String> SPECIAL_COLORS;

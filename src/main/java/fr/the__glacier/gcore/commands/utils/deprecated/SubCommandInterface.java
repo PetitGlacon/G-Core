@@ -1,4 +1,4 @@
-package fr.the__glacier.gcore.commands.utils;
+package fr.the__glacier.gcore.commands.utils.deprecated;
 
 import fr.the__glacier.gcore.config.configObjects.SubCommandConfig;
 import org.bukkit.command.Command;
@@ -9,6 +9,7 @@ import org.jetbrains.annotations.Nullable;
 
 import java.util.List;
 
+@Deprecated
 public interface SubCommandInterface {
     boolean onCommand(@NotNull Plugin plugin, @NotNull CommandSender sender, @NotNull Command cmd, @NotNull String alias, @NotNull String[] args);
     @Nullable

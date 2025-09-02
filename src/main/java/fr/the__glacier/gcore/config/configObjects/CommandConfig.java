@@ -3,10 +3,20 @@ package fr.the__glacier.gcore.config.configObjects;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.Map;
-import java.util.Set;
 
 public class CommandConfig {
     public CommandConfig(){
+        description = "";
+        syntax = "";
+        permission = "";
+        noPermission = "";
+        cooldownInSeconds = 0;
+        isOnCooldown = "";
+        enabled = false;
+        subCommands = null;
+    }
+    public CommandConfig(String name){
+        this.name = name;
         description = "";
         syntax = "";
         permission = "";

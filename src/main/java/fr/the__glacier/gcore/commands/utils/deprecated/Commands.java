@@ -1,4 +1,4 @@
-package fr.the__glacier.gcore.commands.utils;
+package fr.the__glacier.gcore.commands.utils.deprecated;
 
 import fr.the__glacier.gcore.color.MiniMessages;
 import fr.the__glacier.gcore.config.configObjects.CommandConfig;
@@ -14,15 +14,16 @@ import org.jetbrains.annotations.Nullable;
 
 import java.util.*;
 
+@Deprecated
 public class Commands implements CommandExecutor, TabCompleter {
     @Getter
     public CommandConfig command;
     @Getter
-    public SubCommandsManager commandsManager;
+    public SubCommandsManager1 commandsManager;
     public Plugin plugin;
     public TimeUtil.CooldownManager cooldownManager;
 
-    public Commands(Plugin plugin, SubCommandsManager commandsManager, CommandConfig command){
+    public Commands(Plugin plugin, SubCommandsManager1 commandsManager, CommandConfig command){
         this.command = command;
         this.commandsManager = commandsManager;
         this.plugin = plugin;

@@ -1,7 +1,9 @@
 package fr.the__glacier.gcore.util;
 
+import fr.the__glacier.gcore.GCore;
 import lombok.Getter;
 import lombok.Setter;
+import org.bukkit.Bukkit;
 import org.bukkit.entity.Entity;
 import org.jetbrains.annotations.NotNull;
 
@@ -9,6 +11,7 @@ import java.time.Duration;
 import java.util.Calendar;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Objects;
 
 public class TimeUtil {
     public static Calendar calendar = Calendar.getInstance();
@@ -126,8 +129,9 @@ public class TimeUtil {
         long duration;
 
         public CooldownManager(long time){
-            this.duration = time;
+            this.duration = time*1000;
         }
+
         public boolean isOnCooldown(@NotNull Object o){
             if (o instanceof Entity){
                 return isOnCooldown(((Entity) o).getUniqueId());
@@ -155,7 +159,9 @@ public class TimeUtil {
                 return;
             }
             if (isOnCooldown(o)) return;
-            cooldownMap.put(o, this.duration + System.currentTimeMillis());
+            long thisTime = System.currentTimeMillis();
+            long time = this.duration + thisTime;
+            cooldownMap.put(o, time);
         }
     }
 }

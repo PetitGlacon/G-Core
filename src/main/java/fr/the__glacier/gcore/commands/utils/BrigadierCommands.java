@@ -1,4 +1,4 @@
-package fr.the__glacier.gcore.commands.brigadier;
+package fr.the__glacier.gcore.commands.utils;
 
 import com.mojang.brigadier.builder.LiteralArgumentBuilder;
 import fr.the__glacier.gcore.config.configObjects.CommandConfig;
@@ -33,7 +33,8 @@ public class BrigadierCommands {
     }
 
     public void registerCommand(){
-        command = Commands.literal(this.commandConfig.name).requires(sender -> checkPermission(sender.getSender()));
+        String name = Objects.requireNonNullElse(this.commandConfig.name, this.commandConfig.toString());
+        command = Commands.literal(name).requires(sender -> checkPermission(sender.getSender()));
         if (commandsManager == null) return;
         Map<String, SubCommand> map = commandsManager.getCommandMap();
         if (map == null) return;

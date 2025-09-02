@@ -8,11 +8,6 @@ description: A minecraft core plugin for other G- plugins
 folia-supported: true
 load: STARTUP
 commands:
-  gcore:
-    description: main plugin command
-  gcoreutils:
-    description: utilities command
-    usage: gcoreutils
   testCmd:
     desctiption: test cmd
     usage: False

@@ -2,6 +2,7 @@ package fr.the__glacier.gcore.util;
 
 import fr.the__glacier.gcore.GCore;
 import lombok.Setter;
+import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 import org.bukkit.plugin.Plugin;
 
@@ -74,7 +75,7 @@ public class PagedMessage {
         this.message = lists;
     }
 
-    public void sendMessage(Player p, int page){
+    public void sendMessage(CommandSender p, int page){
         this.page = page;
         CompletableFuture.runAsync(() -> {
             List<String> list = message.get(page-1);

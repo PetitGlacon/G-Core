@@ -7,6 +7,7 @@ import java.util.logging.Logger;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+@Deprecated
 public class Gradient implements ColorPatterns {
     java.util.regex.Pattern pattern = java.util.regex.Pattern.compile("&#<([0-9A-Fa-f]{6})>(.*?)&#/<([0-9A-Fa-f]{6})>");
     Pattern pattern2 = Pattern.compile("<gradient:([0-9A-Fa-f]{6})>(.*?)</gradient:([0-9A-Fa-f]{6})>");

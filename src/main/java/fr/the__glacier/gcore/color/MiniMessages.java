@@ -5,8 +5,6 @@ import lombok.Getter;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.minimessage.MiniMessage;
 
-import java.util.*;
-
 public class MiniMessages {
     @Getter
     private final String rawText;

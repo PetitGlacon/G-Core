@@ -5,6 +5,7 @@ import net.md_5.bungee.api.ChatColor;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+@Deprecated
 public class Hexa implements ColorPatterns{
     Pattern pattern = Pattern.compile("&#[a-fA-F0-9]{6}|<color:[a-fA-F0-9]{6}>");
     @Override

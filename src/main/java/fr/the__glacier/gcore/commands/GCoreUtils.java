@@ -1,43 +1,65 @@
 package fr.the__glacier.gcore.commands;
 
+import com.mojang.brigadier.arguments.IntegerArgumentType;
+import com.mojang.brigadier.arguments.StringArgumentType;
+import com.mojang.brigadier.context.CommandContext;
+import com.mojang.brigadier.exceptions.CommandSyntaxException;
 import fr.the__glacier.gcore.GCore;
+import fr.the__glacier.gcore.commands.utils.BrigadierCommands;
+import fr.the__glacier.gcore.commands.utils.SubCommandsManager;
+import fr.the__glacier.gcore.config.configObjects.CommandConfig;
 import fr.the__glacier.gcore.util.PagedMessage;
+import io.papermc.paper.command.brigadier.CommandSourceStack;
+import io.papermc.paper.command.brigadier.Commands;
+import io.papermc.paper.command.brigadier.argument.ArgumentTypes;
+import io.papermc.paper.command.brigadier.argument.resolvers.selector.PlayerSelectorArgumentResolver;
 import org.bukkit.Bukkit;
-import org.bukkit.command.Command;
-import org.bukkit.command.CommandExecutor;
 import org.bukkit.command.CommandSender;
-import org.bukkit.command.TabCompleter;
 import org.bukkit.entity.Player;
-import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.Nullable;
+import org.bukkit.plugin.Plugin;
 
-import java.util.List;
-import java.util.Map;
 import java.util.UUID;
 
-public class GCoreUtils implements CommandExecutor, TabCompleter {
-    @Override
-    public boolean onCommand(@NotNull CommandSender sender, @NotNull Command command, @NotNull String alias, @NotNull String @NotNull [] args) {
-        GCore plugin = GCore.getInstance();
-        if (args.length != 4 && args.length != 3){
-            plugin.getLogger().severe("Failed to parse command : " + alias + " " + String.join(" ", args));
-            return false;
-        }
-        Map<UUID, PagedMessage> pagedMessagesMap = plugin.getPagedMessagesMap();
-        String pluginName = args[0];
-        UUID uuid = UUID.fromString(args[1]);
-        int page = Integer.parseInt(args[2]);
-        if (args.length == 4){
-            sender = Bukkit.getPlayer(args[3]);
-        }
-        PagedMessage pageMessages = pagedMessagesMap.get(uuid);
-        pageMessages.sendMessage((Player) sender, page);
+public class GCoreUtils extends BrigadierCommands {
 
-        return true;
+    public GCoreUtils(Plugin plugin, SubCommandsManager commandsManager, CommandConfig command) {
+        super(plugin, commandsManager, command);
+        registerCommand();
+        this.command.then(Commands.argument("plugin", StringArgumentType.word())
+                .then(Commands.argument("uuid", ArgumentTypes.uuid())
+                        .then(Commands.argument("page", IntegerArgumentType.integer(0))
+                                .executes(this::send)
+                                .then(Commands.argument("player", ArgumentTypes.players()).suggests((context, builder) -> builder.buildFuture())
+                                        .executes(this::sendPlayer))
+                        )
+                )
+        ).requires(t -> true);
     }
 
-    @Override
-    public @Nullable List<String> onTabComplete(@NotNull CommandSender sender, @NotNull Command command, @NotNull String alias, @NotNull String @NotNull [] args) {
-        return List.of();
+
+    public int send(CommandContext<CommandSourceStack> context){
+        String plugin = context.getArgument("plugin", String.class);
+        UUID uuid = context.getArgument("uuid", UUID.class);
+        int page = context.getArgument("page", Integer.class);
+        execute(plugin, uuid, page, context.getSource().getSender());
+
+        return 1;
+    }
+    public int sendPlayer(CommandContext<CommandSourceStack> context) throws CommandSyntaxException {
+        String plugin = context.getArgument("plugin", String.class);
+        UUID uuid = context.getArgument("uuid", UUID.class);
+        int page = context.getArgument("page", Integer.class);
+        PlayerSelectorArgumentResolver resolver = context.getArgument("player", PlayerSelectorArgumentResolver.class);
+        Player player = resolver.resolve(context.getSource()).getFirst();
+        execute(plugin, uuid, page, player);
+
+        return 1;
+    }
+
+    public void execute(String plugin, UUID uuid, int page, CommandSender sender){
+        Plugin pl = Bukkit.getPluginManager().getPlugin(plugin);
+        PagedMessage pagedMessage = GCore.getInstance().getPagedMessagesManager().getPagedMessage(pl, uuid);
+        if (pagedMessage == null) return;
+        pagedMessage.sendMessage(sender, page);
     }
 }

@@ -7,7 +7,7 @@ import org.bukkit.plugin.Plugin;
 import org.jetbrains.annotations.Nullable;
 
 public class SchedulerUtil {
-    private static final boolean isFolia = GCore.getInstance().folia();
+    private static final boolean isFolia = GCore.folia();
 
     @Deprecated
     public static void runTaskAtFixedRate(Plugin plugin, Runnable task, long delay, long period){

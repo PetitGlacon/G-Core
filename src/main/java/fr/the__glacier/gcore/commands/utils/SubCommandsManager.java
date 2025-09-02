@@ -7,8 +7,8 @@ import java.util.List;
 import java.util.Map;
 
 public class SubCommandsManager {
-    private final Map<String, SubCommandInterface> subCommands = new HashMap<>();
-    public void registerSubCommand(@NotNull SubCommandInterface subCommand) {
+    private final Map<String, SubCommand> subCommands = new HashMap<>();
+    public void registerSubCommand(@NotNull SubCommand subCommand) {
         if (!subCommand.getSubCommandConfig().enabled) return;
         List<String> list = subCommand.getSubCommandConfig().aliases;
         for (String str : list){
@@ -16,11 +16,11 @@ public class SubCommandsManager {
         }
     }
 
-    public SubCommandInterface getSubCommand(@NotNull String name) {
+    public SubCommand getSubCommand(@NotNull String name) {
         return subCommands.getOrDefault(name, null);
     }
 
-    public Map<String, SubCommandInterface> getCommandMap() {
+    public Map<String, SubCommand> getCommandMap() {
         return subCommands;
     }
 }

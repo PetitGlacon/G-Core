@@ -13,7 +13,7 @@ public abstract class SubCommand {
 
     public TimeUtil.CooldownManager mainCooldownManager;
     private final TimeUtil.CooldownManager cooldownManager;
-    private String cooldownMessage;
+    private final String cooldownMessage;
 
     public SubCommand(SubCommandConfig config, TimeUtil.CooldownManager mainCooldownManager, String cooldownMessage){
         this.config = config;
@@ -59,6 +59,14 @@ public abstract class SubCommand {
         sender.sendMessage(new MiniMessages(this.cooldownMessage
                 .replace("%time%", String.valueOf(timeRemainingCooldown(sender)))
                 .replace("%time_formatted%", TimeUtil.getDurationFormated(timeRemainingCooldown(sender) * 1000))).getComponent());
+    }
+
+    public boolean checkCooldown(CommandSender sender){
+        if (isOnCooldown(sender)){
+            sendOnCooldown(sender);
+            return true;
+        }
+        return false;
     }
 
     public abstract LiteralArgumentBuilder<CommandSourceStack> getCommand(String alias);

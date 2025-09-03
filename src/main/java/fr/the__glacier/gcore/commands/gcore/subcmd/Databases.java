@@ -39,10 +39,7 @@ public class Databases extends SubCommand {
 
     public int userinfo(CommandContext<CommandSourceStack> context){
         CommandSender sender = context.getSource().getSender();
-        if (isOnCooldown(sender)) {
-            sendOnCooldown(sender);
-            return 0;
-        }
+        if (checkCooldown(sender)) return 0;
         UserTable userTable = GCore.getInstance().getUserTable();
         String userName = context.getArgument("user", String.class);
         UserTable.User u = userTable.getUser(userName);

@@ -1,6 +1,7 @@
 package fr.the__glacier.gcore.util;
 
 import fr.the__glacier.gcore.GCore;
+import fr.the__glacier.gcore.config.GeneralConfig;
 import lombok.Getter;
 import lombok.Setter;
 import org.bukkit.Bukkit;
@@ -74,11 +75,15 @@ public class TimeUtil {
     }
 
 
-    public static String getDurationFormated(Duration duration, String day, String hour, String minute, String second){
-        String d = getDurationDayFormated(duration) + day;
-        String h = getDurationHourFormated(duration) + hour;
-        String m = getDurationMinuteFormated(duration) + minute;
-        String s = getDurationSecondFormated(duration) + second;
+    public static String getDurationFormated(Duration duration, String day, String days, String hour, String hours, String minute, String minutes, String second, String seconds){
+        String d = getDurationDayFormated(duration);
+        String h = getDurationHourFormated(duration);
+        String m = getDurationMinuteFormated(duration);
+        String s = getDurationSecondFormated(duration);
+        d = getS(d, day, days);
+        h = getS(h, hour, hours);
+        m = getS(m, minute, minutes);
+        s = getS(s, second, seconds);
         if (!d.equals("00" + day)){
             return d + h + m + s;
         } else if (!h.equals("00" + hour)){
@@ -87,11 +92,18 @@ public class TimeUtil {
             return m + s;
         } else return s;
     }
+    public static String getS(String duration, String singular, String plural){
+        if (duration.equals("00") || duration.equals("01")){
+            return duration + singular;
+        }
+        return duration + plural;
+    }
     public static String getDurationFormated(Duration duration){
-        return getDurationFormated(duration, " days, ", " hours, ", " minutes, ", " seconds.");
+        GeneralConfig.MessagesParts messagesParts = GCore.getInstance().getGeneralConfig().messagesParts;
+        return getDurationFormated(duration, messagesParts.day, messagesParts.days, messagesParts.hour, messagesParts.hours, messagesParts.minute, messagesParts.minutes, messagesParts.second, messagesParts.seconds);
     }
     public static String getDurationFormated(Long milliseconds){
-        return getDurationFormated(Duration.ofMillis(milliseconds), " days, ", " hours, ", " minutes, ", " seconds");
+        return getDurationFormated(Duration.ofMillis(milliseconds));
     }
 
     public static String getDurationDayFormated(Duration duration) {

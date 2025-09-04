@@ -5,7 +5,7 @@ import fr.the__glacier.gcore.commands.utils.BrigadierCommands;
 import fr.the__glacier.gcore.commands.utils.SubCommandsManager;
 import fr.the__glacier.gcore.commands.gcore.GCoreCommand;
 import fr.the__glacier.gcore.config.Commands;
-import fr.the__glacier.gcore.config.SQL;
+import fr.the__glacier.gcore.config.GeneralConfig;
 import fr.the__glacier.gcore.config.configObjects.CommandConfig;
 import fr.the__glacier.gcore.database.DatabasesManager;
 import fr.the__glacier.gcore.database.UserTable;
@@ -27,7 +27,7 @@ public final class GCore extends JavaPlugin {
     private static GCore instance;
 
     private ConfigurationManager configurationManager;
-    private SQL sql;
+    private GeneralConfig generalConfig;
     private Commands commands;
 
     private DatabasesManager databasesManager;
@@ -57,6 +57,7 @@ public final class GCore extends JavaPlugin {
         loadConfig();
         saveConfig();
         configTest.load();
+        GeneralConfig.SQL sql = generalConfig.sqlInfos;
         this.databasesManager = new DatabasesManager(sql.SQLType, sql.host, sql.port, sql.dataBase, sql.userName, sql.password);
         loadTables();
         registerListeners();
@@ -89,14 +90,14 @@ public final class GCore extends JavaPlugin {
     public void loadConfig(){
         configTest = configurationManager.load(ConfigTest.class);
         configTest2 = configurationManager.load(ConfigTest.class);
-        sql = configurationManager.load(SQL.class);
+        generalConfig = configurationManager.load(GeneralConfig.class);
         commands = configurationManager.load(Commands.class);
     }
 
     public void saveConfig(){
         configurationManager.save(configTest);
         configurationManager.saveWithFolders(configTest2, "fichier", "bonjour", "test", "test 2");
-        configurationManager.save(sql);
+        configurationManager.save(generalConfig);
         configurationManager.save(commands);
     }
 

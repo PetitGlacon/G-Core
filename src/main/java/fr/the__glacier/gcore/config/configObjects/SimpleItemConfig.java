@@ -3,6 +3,7 @@ package fr.the__glacier.gcore.config.configObjects;
 import fr.the__glacier.gcore.color.MiniMessages;
 import io.papermc.paper.registry.RegistryAccess;
 import io.papermc.paper.registry.RegistryKey;
+import net.kyori.adventure.text.Component;
 import org.bukkit.Material;
 import org.bukkit.NamespacedKey;
 import org.bukkit.Registry;
@@ -12,6 +13,7 @@ import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
 import org.jetbrains.annotations.NotNull;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
@@ -33,6 +35,13 @@ public class SimpleItemConfig {
             item = new ItemStack(material, amount);
         } else {
             return air();
+        }
+        if (lore != null && !lore.isEmpty()){
+            List<Component> l = new ArrayList<>();
+            for (String str : lore){
+                l.add(new MiniMessages(str).getComponent());
+            }
+            item.lore(l);
         }
         if (enchantments != null){
             Registry<@NotNull Enchantment> enchantmentsRegistry = RegistryAccess.registryAccess().getRegistry(RegistryKey.ENCHANTMENT);

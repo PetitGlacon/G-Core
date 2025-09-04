@@ -3,6 +3,8 @@ package fr.the__glacier.gcore;
 import com.fasterxml.jackson.core.JsonFactory;
 import com.fasterxml.jackson.core.JsonParser;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.PropertyNamingStrategies;
+import com.fasterxml.jackson.databind.PropertyNamingStrategy;
 import com.fasterxml.jackson.dataformat.yaml.YAMLFactory;
 
 import org.bukkit.Bukkit;
@@ -41,6 +43,7 @@ public class ConfigurationManager {
         javaPlugin.getDataFolder().mkdir();
 
         objectMapper = new ObjectMapper(persistType.getFactory()).configure(JsonParser.Feature.IGNORE_UNDEFINED, true);
+        objectMapper.setPropertyNamingStrategy(PropertyNamingStrategies.SNAKE_CASE);
     }
 
     /**
@@ -224,9 +227,12 @@ public class ConfigurationManager {
      */
     public <T> T load(Class<T> clazz, File file) {
         if (file.exists()) {
+            javaPlugin.getLogger().warning("one");
             try {
+                javaPlugin.getLogger().warning("two");
                 return objectMapper.readValue(file, clazz);
             } catch (IOException e) {
+                javaPlugin.getLogger().warning("three");
                 javaPlugin.getLogger().severe("Failed to parse " + file + ": " + e.getMessage());
                 javaPlugin.getLogger().severe("Creating a backup for " + file.getName() + " in \"backups\" folder...");
 
@@ -235,12 +241,17 @@ public class ConfigurationManager {
                 File backupFolder = new File(pluginFolder.getPath() + File.separator + backupFolderName);
                 File backupConfigFile = getBackUpFile(file, backupFolder);
 
+
+                javaPlugin.getLogger().warning("four");
                 try {
                     if (!backupFolder.exists()) backupFolder.mkdir();
                     Files.copy(file.toPath(), backupConfigFile.toPath(), StandardCopyOption.REPLACE_EXISTING);
                     Files.delete(file.toPath());
                     javaPlugin.getLogger().info("Success! Backup \"" + file.getName() + "\" created, check \"" + backupFolder.getPath() + "\".");
+                    javaPlugin.getLogger().warning("five");
                 } catch (IOException exception) {
+
+                    javaPlugin.getLogger().warning("six");
                     javaPlugin.getLogger().severe(
                             "Failed to move " + file + " to "
 
@@ -249,6 +260,8 @@ public class ConfigurationManager {
                     Bukkit.getPluginManager().disablePlugin(javaPlugin);
                     javaPlugin.getLogger().severe(e.getMessage());
                 }
+
+                javaPlugin.getLogger().warning("seven");
                 // load(clazz, file);
             }
         }

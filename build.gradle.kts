@@ -19,11 +19,11 @@ repositories {
 
 dependencies {
     paperweight.paperDevBundle("1.21.8-R0.1-SNAPSHOT")
-    // implementation("lien") -> inclu le lien dans le projet
-    // compileOnly("lien") -> ajoute un projet en dépendance (pas inclu dans le jar final)
-    implementation("com.fasterxml.jackson.core:jackson-core:2.15.3")
-    implementation("com.fasterxml.jackson.dataformat:jackson-dataformat-yaml:2.15.3")
-    implementation("de.tr7zw:item-nbt-api:2.14.1")
+    // implementation("lien") -> inclus le lien dans le projet
+    // compileOnly("lien") -> ajoute un projet en dépendance (pas inclus dans le jar final)
+    implementation("com.fasterxml.jackson.core:jackson-core:2.20.0")
+    implementation("com.fasterxml.jackson.dataformat:jackson-dataformat-yaml:2.20.0")
+    implementation("de.tr7zw:item-nbt-api:2.15.2")
 
 
     compileOnly("org.projectlombok:lombok:1.18.30")

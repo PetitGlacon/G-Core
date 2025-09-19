@@ -10,6 +10,7 @@ import fr.the__glacier.gcore.config.configObjects.CommandConfig;
 import fr.the__glacier.gcore.database.DatabasesManager;
 import fr.the__glacier.gcore.database.UserTable;
 import fr.the__glacier.gcore.listener.CommandCompletionListener;
+import fr.the__glacier.gcore.listener.InventoryClickListener;
 import fr.the__glacier.gcore.listener.PlayerJoinListener;
 import fr.the__glacier.gcore.listener.PlayerLeaveListener;
 import fr.the__glacier.gcore.test.ConfigTest;
@@ -46,10 +47,9 @@ public final class GCore extends JavaPlugin {
     @Override
     public void onEnable() {
         instance = this;
-        getLogger().severe("true");
         VERSION = getVersion();
         if (!NBT.preloadApi()){
-            getLogger().warning("NBT-API wasn't initialized properly, disabling the plugin");
+            getLogger().severe("NBT-API wasn't initialized properly, disabling the plugin.");
             Bukkit.getPluginManager().disablePlugin(this);
             return;
         }
@@ -109,6 +109,7 @@ public final class GCore extends JavaPlugin {
         Bukkit.getPluginManager().registerEvents(new PlayerJoinListener(), this);
         Bukkit.getPluginManager().registerEvents(new PlayerLeaveListener(), this);
         Bukkit.getPluginManager().registerEvents(new CommandCompletionListener(), this);
+        Bukkit.getPluginManager().registerEvents(new InventoryClickListener(), this);
     }
 
     private static int getVersion() {

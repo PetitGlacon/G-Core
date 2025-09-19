@@ -1,17 +1,13 @@
 package fr.the__glacier.gcore.config.configObjects;
 
+import fr.the__glacier.gcore.GCore;
 import fr.the__glacier.gcore.color.MiniMessages;
-import io.papermc.paper.registry.RegistryAccess;
-import io.papermc.paper.registry.RegistryKey;
+import io.papermc.paper.datacomponent.DataComponentTypes;
+import io.papermc.paper.datacomponent.item.CustomModelData;
 import net.kyori.adventure.text.Component;
 import org.bukkit.Material;
-import org.bukkit.NamespacedKey;
-import org.bukkit.Registry;
-import org.bukkit.enchantments.Enchantment;
 import org.bukkit.inventory.ItemFlag;
 import org.bukkit.inventory.ItemStack;
-import org.bukkit.inventory.meta.ItemMeta;
-import org.jetbrains.annotations.NotNull;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -20,16 +16,28 @@ import java.util.Map;
 public class SimpleItemConfig {
     public String plugin;
     public String material;
-    public String itemName;
-    public int amount;
-    public List<String> lore;
-    public Map<String, Integer> enchantments;
-    public ItemOptions options;
+    public String itemName = null;
+    public int amount = 1;
+    public List<String> lore = null;
+    public ItemOptions options = new ItemOptions();
+
+    public SimpleItemConfig(){
+        this.plugin = "minecraft";
+        this.material = "stone";
+    }
+    public SimpleItemConfig(String plugin, String material, String itemName, int amount, List<String> lore, ItemOptions options){
+        this.plugin = plugin;
+        this.material = material;
+        this.itemName = itemName;
+        this.amount = amount;
+        this.lore = lore;
+        this.options = options;
+    }
 
 
     public ItemStack getItem(){
         ItemStack item;
-        if (this.plugin.equalsIgnoreCase ("minecraft:")){
+        if (this.plugin.equalsIgnoreCase("minecraft")){
             Material material = Material.matchMaterial(this.material.toUpperCase());
             if (material == null) return air();
             item = new ItemStack(material, amount);
@@ -43,33 +51,95 @@ public class SimpleItemConfig {
             }
             item.lore(l);
         }
-        if (enchantments != null){
-            Registry<@NotNull Enchantment> enchantmentsRegistry = RegistryAccess.registryAccess().getRegistry(RegistryKey.ENCHANTMENT);
-            for (Map.Entry<String, Integer> enchant : enchantments.entrySet()){
-                NamespacedKey key = NamespacedKey.fromString(enchant.getKey());
-                if (key == null) continue;
-                Enchantment enchantment = enchantmentsRegistry.get(key);
-                if (enchantment == null) continue;
-                item.addUnsafeEnchantment(enchantment, enchant.getValue());
+        if (itemName != null) item.setData(DataComponentTypes.CUSTOM_NAME, new MiniMessages(itemName).getComponent());
+        if (options != null){
+            if (options.glint != null) {
+                if (options.glint) {
+                    item.setData(DataComponentTypes.ENCHANTMENT_GLINT_OVERRIDE, true);
+                } else {
+                    item.setData(DataComponentTypes.ENCHANTMENT_GLINT_OVERRIDE, false);
+                }
+            }
+            if (options.itemFlags != null){
+                item.addItemFlags(options.itemFlags);
+            }
+            if (options.customModelData != null){
+                CustomModelData customModelData = CustomModelData.customModelData()
+                        .addFloat(options.customModelData)
+                        .build();
+                item.setData(DataComponentTypes.CUSTOM_MODEL_DATA, customModelData);
             }
         }
-        ItemMeta itemMeta = item.getItemMeta();
-        if (itemName != null) itemMeta.itemName(new MiniMessages(itemName).getComponent());
-        if (options != null){
-            itemMeta.addItemFlags(options.itemFlags);
-            itemMeta.setUnbreakable(options.unbreakable);
-            itemMeta.setCustomModelData(options.customModelData);
-        }
-        item.setItemMeta(itemMeta);
         return item;
+    }
+    public ItemStack getItem(Map<String, String> placeholders){
+        if (placeholders == null) return getItem();
+        ItemStack item;
+        if (this.plugin.equalsIgnoreCase("minecraft")){
+            Material material = Material.matchMaterial(this.material.toUpperCase());
+            if (material == null) return air();
+            item = new ItemStack(material, amount);
+        } else {
+            return air();
+        }
+        if (lore != null && !lore.isEmpty()){
+            List<Component> l = new ArrayList<>();
+            for (String str : lore){
+                l.add(getComponent(str, placeholders));
+            }
+            item.lore(l);
+        }
+        if (itemName != null) item.setData(DataComponentTypes.CUSTOM_NAME, getComponent(itemName, placeholders));
+        if (options != null){
+            if (options.glint != null) {
+                if (options.glint) {
+                    item.setData(DataComponentTypes.ENCHANTMENT_GLINT_OVERRIDE, true);
+                } else {
+                    item.setData(DataComponentTypes.ENCHANTMENT_GLINT_OVERRIDE, false);
+                }
+            }
+            if (options.itemFlags != null){
+                item.addItemFlags(options.itemFlags);
+            }
+            if (options.customModelData != null){
+                CustomModelData customModelData = CustomModelData.customModelData()
+                        .addFloat(options.customModelData)
+                        .build();
+                item.setData(DataComponentTypes.CUSTOM_MODEL_DATA, customModelData);
+            }
+        }
+        return item;
+    }
+    public Component getComponent(String str, Map<String, String> placeholders){
+        for (Map.Entry<String, String> entry : placeholders.entrySet()){
+            str = str.replace(entry.getKey(), entry.getValue());
+        }
+        MiniMessages miniMessages = new MiniMessages(str);
+        return miniMessages.getComponent();
     }
     public ItemStack air(){
         return new ItemStack(Material.AIR);
     }
 
     public static class ItemOptions{
-        public boolean unbreakable;
-        public int customModelData;
-        public ItemFlag[] itemFlags;
+        public Integer customModelData = null;
+        public Boolean glint = null;
+        public ItemFlag[] itemFlags = null;
+
+        public boolean unbreakable = false;
+
+        public ItemOptions(){}
+        public ItemOptions(Integer customModelData, Boolean glint, ItemFlag[] itemFlags){
+            this.customModelData = customModelData;
+            this.glint = glint;
+            this.itemFlags = itemFlags;
+        }
+        public ItemOptions(Integer customModelData, Boolean glint, ItemFlag[] itemFlags, boolean unbreakable){
+            this.customModelData = customModelData;
+            this.glint = glint;
+            this.itemFlags = itemFlags;
+
+            this.unbreakable = unbreakable;
+        }
     }
 }

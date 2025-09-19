@@ -4,7 +4,6 @@ import com.fasterxml.jackson.core.JsonFactory;
 import com.fasterxml.jackson.core.JsonParser;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.PropertyNamingStrategies;
-import com.fasterxml.jackson.databind.PropertyNamingStrategy;
 import com.fasterxml.jackson.dataformat.yaml.YAMLFactory;
 
 import org.bukkit.Bukkit;
@@ -12,12 +11,14 @@ import org.bukkit.plugin.java.JavaPlugin;
 
 import java.io.File;
 import java.io.IOException;
+import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Type;
 import java.nio.file.Files;
 import java.nio.file.StandardCopyOption;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.Locale;
+import java.util.logging.Level;
 
 /**
  * Class which persists configuration files.
@@ -227,12 +228,9 @@ public class ConfigurationManager {
      */
     public <T> T load(Class<T> clazz, File file) {
         if (file.exists()) {
-            javaPlugin.getLogger().warning("one");
             try {
-                javaPlugin.getLogger().warning("two");
                 return objectMapper.readValue(file, clazz);
             } catch (IOException e) {
-                javaPlugin.getLogger().warning("three");
                 javaPlugin.getLogger().severe("Failed to parse " + file + ": " + e.getMessage());
                 javaPlugin.getLogger().severe("Creating a backup for " + file.getName() + " in \"backups\" folder...");
 
@@ -241,17 +239,12 @@ public class ConfigurationManager {
                 File backupFolder = new File(pluginFolder.getPath() + File.separator + backupFolderName);
                 File backupConfigFile = getBackUpFile(file, backupFolder);
 
-
-                javaPlugin.getLogger().warning("four");
                 try {
                     if (!backupFolder.exists()) backupFolder.mkdir();
                     Files.copy(file.toPath(), backupConfigFile.toPath(), StandardCopyOption.REPLACE_EXISTING);
                     Files.delete(file.toPath());
                     javaPlugin.getLogger().info("Success! Backup \"" + file.getName() + "\" created, check \"" + backupFolder.getPath() + "\".");
-                    javaPlugin.getLogger().warning("five");
                 } catch (IOException exception) {
-
-                    javaPlugin.getLogger().warning("six");
                     javaPlugin.getLogger().severe(
                             "Failed to move " + file + " to "
 
@@ -260,16 +253,13 @@ public class ConfigurationManager {
                     Bukkit.getPluginManager().disablePlugin(javaPlugin);
                     javaPlugin.getLogger().severe(e.getMessage());
                 }
-
-                javaPlugin.getLogger().warning("seven");
-                // load(clazz, file);
             }
         }
 
         try {
-            return clazz.newInstance();
-        } catch (InstantiationException | IllegalAccessException e) {
-            e.printStackTrace();
+            return clazz.getDeclaredConstructor().newInstance();
+        } catch (NoSuchMethodException | InstantiationException | IllegalAccessException | InvocationTargetException e) {
+            javaPlugin.getLogger().log(Level.SEVERE, "Error returning a clean instance", e);
         }
         return null;
     }
@@ -295,7 +285,7 @@ public class ConfigurationManager {
         try {
             return objectMapper.readValue(content, clazz);
         } catch (IOException e) {
-            e.printStackTrace();
+            javaPlugin.getLogger().log(Level.SEVERE, "Cannot serialize specified content", e);
             Bukkit.getPluginManager().disablePlugin(javaPlugin);
         }
 

@@ -1,12 +1,14 @@
 package fr.the__glacier.gcore.test;
 
 import fr.the__glacier.gcore.GCore;
+import fr.the__glacier.gcore.gui.SimpleGUI;
 import fr.the__glacier.gcore.util.PlayerUtil;
 import io.papermc.paper.event.player.AsyncChatEvent;
 import org.bukkit.Bukkit;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.inventory.BrewEvent;
+import org.bukkit.event.inventory.InventoryClickEvent;
 import org.bukkit.event.player.PlayerCommandSendEvent;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.PotionMeta;
@@ -22,6 +24,7 @@ public class Listeners implements Listener {
         event.setCancelled(true);
         PlayerUtil.broadcastMiniMessage(event.message());
     }
+
 
     @EventHandler
     public void onPotionBrew(BrewEvent event){

@@ -2,6 +2,7 @@ package fr.the__glacier.gcore.config.configObjects;
 
 import org.jetbrains.annotations.Nullable;
 
+import java.util.List;
 import java.util.Map;
 
 public class CommandConfig {
@@ -14,6 +15,7 @@ public class CommandConfig {
         isOnCooldown = "";
         enabled = false;
         subCommands = null;
+        this.alias = null;
     }
     public CommandConfig(String name){
         this.name = name;
@@ -25,8 +27,16 @@ public class CommandConfig {
         isOnCooldown = "";
         enabled = false;
         subCommands = null;
+        this.alias = null;
     }
-    public CommandConfig(String description, String syntax, String permission, String noPermission, Long cooldownInSeconds, String isOnCooldown, boolean enabled, @Nullable Map<String,SubCommandConfig> subCommands){
+    public CommandConfig(String description,
+                         String syntax,
+                         String permission,
+                         String noPermission,
+                         Long cooldownInSeconds,
+                         String isOnCooldown,
+                         boolean enabled,
+                         @Nullable Map<String,SubCommandConfig> subCommands){
         this.name = "cmd";
         this.description = description;
         this.syntax = syntax;
@@ -37,7 +47,13 @@ public class CommandConfig {
         this.enabled = enabled;
         this.subCommands = subCommands;
     }
-    public CommandConfig(String description, String syntax, String permission, String noPermission, Long cooldownInSeconds, String isOnCooldown, boolean enabled){
+    public CommandConfig(String description,
+                         String syntax,
+                         String permission,
+                         String noPermission,
+                         Long cooldownInSeconds,
+                         String isOnCooldown,
+                         boolean enabled){
         this.name = "cmd";
         this.description = description;
         this.syntax = syntax;
@@ -48,7 +64,16 @@ public class CommandConfig {
         this.enabled = enabled;
         this.subCommands = null;
     }
-    public CommandConfig(String name, String description, String syntax, String permission, String noPermission, Long cooldownInSeconds, String isOnCooldown, boolean enabled, @Nullable Map<String,SubCommandConfig> subCommands){
+    public CommandConfig(String name,
+                         String description,
+                         String syntax,
+                         String permission,
+                         String noPermission,
+                         Long cooldownInSeconds,
+                         String isOnCooldown,
+                         boolean enabled,
+                         @Nullable Map<String,SubCommandConfig> subCommands,
+                         @Nullable List<String> alias){
         this.name = name;
         this.description = description;
         this.syntax = syntax;
@@ -58,6 +83,7 @@ public class CommandConfig {
         this.isOnCooldown = isOnCooldown;
         this.enabled = enabled;
         this.subCommands = subCommands;
+        this.alias = alias;
     }
 
     public String name;
@@ -68,6 +94,7 @@ public class CommandConfig {
     public long cooldownInSeconds;
     public String isOnCooldown;
     public boolean enabled;
+    public List<String> alias;
     @Nullable
     public Map<String,SubCommandConfig> subCommands;
 }

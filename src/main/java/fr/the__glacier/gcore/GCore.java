@@ -22,6 +22,8 @@ import lombok.Getter;
 import org.bukkit.Bukkit;
 import org.bukkit.plugin.java.JavaPlugin;
 
+import java.util.List;
+
 @Getter
 public final class GCore extends JavaPlugin {
     @Getter
@@ -83,7 +85,13 @@ public final class GCore extends JavaPlugin {
 
     public void registerCommand(BrigadierCommands command){
         this.getLifecycleManager().registerEventHandler(LifecycleEvents.COMMANDS, commands -> {
-            commands.registrar().register(command.getCommand().build());
+            List<String> alias = command.getCommandConfig().alias;
+            if (alias == null || alias.isEmpty()){
+                commands.registrar().register(command.getCommand().build());
+            } else {
+                commands.registrar().register(command.getCommand().build(), command.getCommandConfig().alias);
+            }
+            ;
         });
     }
 

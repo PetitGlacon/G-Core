@@ -9,6 +9,7 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.bukkit.entity.Player;
 
+import javax.print.attribute.standard.JobKOctets;
 import java.util.*;
 import java.util.concurrent.CompletableFuture;
 
@@ -29,24 +30,45 @@ public class UserTable extends BaseDataTable {
         CompletableFuture.runAsync(this::loadDataFromDatabase);
     }
 
+    public <T> T getObject(Object object, Class<T> clazz){
+        if (clazz.isInstance(object)) return clazz.cast(object);
+        return null;
+    }
     @Override
     public void loadDataFromDatabase() {
-        List<String> var1 = databasesManager.getDataListFromColumn(tableName, ColumnsNames.ID.getName());
-        for (String str : var1){
-            List<String> var2 = databasesManager.getDataLine(tableName, ColumnsNames.ID.getName(), str, ColumnsNames.values().length);
+        List<Map<String, Object>> data = databasesManager.getAllData(tableName);
+        for (Map<String, Object> map : data){
             try {
-                int id = Integer.parseInt(var2.get(0));
-                UUID uuid = UUID.fromString(var2.get(1));
-                String name = var2.get(2);
-                long firstJoinTime = Long.parseLong(var2.get(3));
-                long lastJoinTime = Long.parseLong(var2.get(4));
-                long lastLeaveTime = Long.parseLong(var2.get(5));
+                int id = (int) map.get(ColumnsNames.ID.getName());
+                UUID uuid = UUID.fromString((String) map.get(ColumnsNames.ID.getName()));
+                String name = (String) map.get(ColumnsNames.ID.getName());
+                long firstJoinTime = (long) map.get(ColumnsNames.ID.getName());
+                long lastJoinTime = (long) map.get(ColumnsNames.ID.getName());
+                long lastLeaveTime = (long) map.get(ColumnsNames.ID.getName());
 
                 addUserFromDB(new User(id, uuid, name, firstJoinTime, lastJoinTime, lastLeaveTime));
-            } catch (Exception e){
-                log.log(Level.ERROR, e.getMessage(), e);
+            } catch (ClassCastException exception){
+                exception.printStackTrace();
             }
         }
+//        List<Map<String, Object>> var1 = databasesManager.getDataListFromColumn(tableName, ColumnsNames.ID.getName());
+//        for (Map<String, Object> map : var1){
+//            if (map.get(ColumnsNames.ID.getName()) instanceof String str) {
+//                Map<String, Object> var2 = databasesManager.getDataLine(tableName, ColumnsNames.ID.getName(), str, ColumnsNames.values().length).getFirst();
+//                try {
+//                    int id = Integer.parseInt(var2.get(0));
+//                    UUID uuid = UUID.fromString(var2.get(1));
+//                    String name = var2.get(2);
+//                    long firstJoinTime = Long.parseLong(var2.get(3));
+//                    long lastJoinTime = Long.parseLong(var2.get(4));
+//                    long lastLeaveTime = Long.parseLong(var2.get(5));
+//
+//                    addUserFromDB(new User(id, uuid, name, firstJoinTime, lastJoinTime, lastLeaveTime));
+//                } catch (Exception e) {
+//                    log.log(Level.ERROR, e.getMessage(), e);
+//                }
+//            }
+//        }
         GCore.getInstance().getLogger().warning("Data loaded from " + tableName);
     }
     public User getUser(String pseudo){

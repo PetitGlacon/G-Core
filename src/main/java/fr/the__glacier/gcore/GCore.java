@@ -91,7 +91,6 @@ public final class GCore extends JavaPlugin {
             } else {
                 commands.registrar().register(command.getCommand().build(), command.getCommandConfig().alias);
             }
-            ;
         });
     }
 

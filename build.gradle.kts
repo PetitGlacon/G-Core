@@ -25,6 +25,8 @@ dependencies {
     implementation("com.fasterxml.jackson.dataformat:jackson-dataformat-yaml:2.20.0")
     implementation("de.tr7zw:item-nbt-api:2.15.2")
 
+    implementation("com.zaxxer:HikariCP:7.0.2")
+
 
     compileOnly("org.projectlombok:lombok:1.18.30")
     // compileOnly("io.papermc.paper:paper-api:1.21.4-R0.1-SNAPSHOT")

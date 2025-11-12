@@ -180,45 +180,10 @@ public class DatabasesManager {
     public List<Map<String, Object>> getDataListFromColumn(String tablename, String column){
         String request = "SELECT " + column + " FROM " + tablename;
         return executeQuery(request);
-//        try {
-//            PreparedStatement statement = connection.prepareStatement(request);
-//
-//            ResultSet resultat = statement.executeQuery();
-//
-//            while (resultat.next()) {
-//                String data = resultat.getString(column);
-//                valeurs.add(data);
-//            }
-//            resultat.close();
-//            return valeurs;
-//        } catch (SQLException e) {
-//            logger.severe("Impossible de récupérer les valeurs dans la colonne " + column + " de la table " + tablename + " dans la base de donnée.");
-//            logger.warning(request);
-//            log.log(Level.ERROR, e.getMessage(), e);
-//            return valeurs;
-//        }
     }
     public List<Map<String, Object>> getDataListFromColumn(String tablename, String column, String conditions){
         String request = "SELECT " + column + " FROM " + tablename + " WHERE " + conditions;
         return executeQuery(request);
-//        List<String> valeurs = new ArrayList<>();
-//        try {
-//            PreparedStatement statement = connection.prepareStatement(request);
-//
-//            ResultSet resultat = statement.executeQuery();
-//
-//            while (resultat.next()) {
-//                String data = resultat.getString(column);
-//                valeurs.add(data);
-//            }
-//            resultat.close();
-//            return valeurs;
-//        } catch (SQLException e) {
-//            logger.severe("Impossible de récupérer les valeurs dans la colonne " + column + " de la table " + tablename + " dans la base de donnée.");
-//            logger.warning(request);
-//            log.log(Level.ERROR, e.getMessage(), e);
-//            return valeurs;
-//        }
     }
 
     public String getDataString(String tablename, String column1, String column2, String valueColumn2){
@@ -230,24 +195,6 @@ public class DatabasesManager {
         } else {
             return null;
         }
-//        try {
-//            PreparedStatement statement = connection.prepareStatement(request);
-//            statement.setString(1, "'" +  valueColumn2 + "'");
-//
-//            ResultSet resultat = statement.executeQuery();
-//
-//            if (resultat.next()) {
-//                resultat.close();
-//                return resultat.getString(column1);
-//            } else {
-//                return null;
-//            }
-//        } catch (SQLException e) {
-//            logger.severe("Impossible de récupérer des valeurs dans la table " + tablename + " dans la base de donnée.");
-//            logger.warning(request);
-//            log.log(Level.ERROR, e.getMessage(), e);
-//            return null;
-//        }
     }
 
 
@@ -266,106 +213,28 @@ public class DatabasesManager {
         String request = "INSERT INTO " + tablename + " (" + columnsBuilder + ") VALUES (" + valuesBuilder + ")";
 
         executeUpdate(request);
-//        try {
-//            PreparedStatement statement = connection.prepareStatement(request);
-//            statement.executeUpdate();
-//            statement.close();
-//        } catch (SQLException e) {
-//            logger.severe("Impossible d'ajouter des valeurs à " + tablename + " dans la base de donnée.");
-//            logger.warning(request);
-//            log.log(Level.ERROR, e.getMessage(), e);
-//        }
     }
 
     public void updateData(String tablename, String column, String value, String comparator, String columnToChange, String valueToChange){
         String request = "UPDATE " + tablename + " SET " + columnToChange + " = '" + valueToChange + "' WHERE " + column + " " + comparator + " '" + value + "';";
         executeUpdate(request);
-//        try {
-//            PreparedStatement statement = connection.prepareStatement(request);
-//            statement.executeUpdate();
-//            statement.close();
-//        } catch (SQLException e) {
-//            logger.severe("Impossible de changer des valeurs à " + tablename + " dans la base de donnée.");
-//            logger.warning(request);
-//            log.log(Level.ERROR, e.getMessage(), e);
-//        }
     }
     public void moveLinesFromDatabase(String from, String to, String condition){
         String request = "INSERT INTO " + to + " SELECT * FROM " + from + " WHERE " + condition + ";";
         executeUpdate(request);
-//        try {
-//            PreparedStatement statement = connection.prepareStatement(request);
-//            statement.executeUpdate();
-//            statement.close();
-//        } catch (SQLException e) {
-//            logger.severe("Impossible de changer des valeurs de " + from + " à " + to  + " dans la base de donnée.");
-//            logger.warning(request);
-//            log.log(Level.ERROR, e.getMessage(), e);
-//        }
     }
     public void removeData(String tablename, String condition){
         String request = "DELETE FROM " + tablename  + " WHERE " + condition + ";";
         executeUpdate(request);
-//        try {
-//            PreparedStatement statement = connection.prepareStatement(request);
-//            statement.executeUpdate();
-//            statement.close();
-//        } catch (SQLException e) {
-//            logger.severe("Impossible de supprimer des valeurs de " + tablename + " dans la base de donnée.");
-//            logger.warning(request);
-//            log.log(Level.ERROR, e.getMessage(), e);
-//        }
     }
     public boolean dataFromDatabaseExist(String tablename, String column, String value){
         String request = "SELECT * FROM " + tablename + " WHERE " + column + " = ?";
         List<Map<String, Object>> list = executeQuery(request, value);
         return list.getFirst().get(column) != null;
-//        try {
-//            PreparedStatement statement = connection.prepareStatement(request);
-//            statement.setString(1, value);
-//            ResultSet resultat = statement.executeQuery();
-//            if (resultat.next()){
-//                String str = resultat.getString(1);
-//                resultat.close();
-//                return str != null;
-//            } else return false;
-//        } catch (SQLException e){
-//            logger.severe("Impossible de récupérer des valeurs dans la table " + tablename + " dans la base de donnée.");
-//            logger.warning(request + " / replace ? with " + value);
-//            log.log(Level.ERROR, e.getMessage(), e);
-//            return false;
-//        }
     }
 
-    public List<Map<String, Object>> getDataLine(String tablename, String column, String valueColumn, int nbColonnes){
+    public List<Map<String, Object>> getDataLine(String tablename, String column, String valueColumn){
         String request = "SELECT * FROM " + tablename + " WHERE " + column + " = ?";
         return executeQuery(request, valueColumn);
-//        try {
-//            PreparedStatement statement = connection.prepareStatement(request);
-//            statement.setString(1, valueColumn);
-//
-//            try {
-//                ResultSet resultat = statement.executeQuery();
-//                List<String> data = new ArrayList<>();
-//                if (resultat.next()) {
-//                    for (int i = 1; i <= nbColonnes; i++) {
-//                        data.add(resultat.getString(i).replace("`", "'"));
-//                    }
-//                }
-//                resultat.close();
-//                return data;
-//            } catch (SQLException e){
-//                logger.severe("Impossible de récupérer des valeurs dans la table " + tablename + " dans la base de donnée.");
-//                logger.warning(request + " / replace ? with " + valueColumn);
-//                logger.warning(statement.toString());
-//                log.log(Level.ERROR, e.getMessage(), e);
-//                return null;
-//            }
-//        } catch (SQLException e) {
-//            logger.severe("Impossible de récupérer des valeurs dans la table " + tablename + " dans la base de donnée.");
-//            logger.warning(request + " / replace ? with " + valueColumn);
-//            log.log(Level.ERROR, e.getMessage(), e);
-//            return null;
-//        }
     }
 }

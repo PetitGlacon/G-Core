@@ -5,6 +5,7 @@ import com.zaxxer.hikari.HikariConfig;
 import com.zaxxer.hikari.HikariDataSource;
 import fr.the__glacier.gcore.GCore;
 import org.apache.logging.log4j.LogManager;
+import org.bukkit.plugin.java.JavaPlugin;
 
 import java.io.File;
 import java.sql.*;
@@ -16,12 +17,13 @@ import java.util.logging.Logger;
 
 public class DatabasesManager {
     private static final org.apache.logging.log4j.Logger log = LogManager.getLogger(DatabasesManager.class);
-    // private Connection connection;
     private HikariDataSource dataSource;
     private final Logger logger = GCore.getInstance().getLogger();
     public SQLType sqlType;
 
-    public DatabasesManager(SQLType type, String host, int port, String name, String username, String password){
+    public DatabasesManager(JavaPlugin plugin, SQLType type, String host, int port, String name, String username, String password){
+        this.sqlType = type;
+
         HikariConfig hikariConfig = new HikariConfig();
         hikariConfig.setLeakDetectionThreshold(3000);
         hikariConfig.setConnectionTimeout(5000);
@@ -34,48 +36,26 @@ public class DatabasesManager {
                 hikariConfig.setPassword(password);
                 hikariConfig.setMaximumPoolSize(10);
                 hikariConfig.setMinimumIdle(1);
-                // createManager("jdbc:mysql://" + host + ":" + port + "/" + name, username, password);
             }
             case SQLITE -> {
                 String path;
                 if (host == null){
-                    path = GCore.getInstance().getDataFolder().getPath() + "/database/" + "/" + name + ".db";
+                    path = plugin.getDataFolder().getPath() + "/database/" + "/" + name + ".db";
                 } else {
-                    path = GCore.getInstance().getDataFolder().getPath() + "/database/" + host + "/" + name + ".db";
+                    path = plugin.getDataFolder().getPath() + "/database/" + host + "/" + name + ".db";
                 }
                 File file = new File(path);
-                file.mkdirs();
+                file.getParentFile().mkdirs();
 
                 String jdbcUrl = "jdbc:sqlite:" + path;
                 hikariConfig.setJdbcUrl(jdbcUrl);
                 hikariConfig.setMaximumPoolSize(1);
                 hikariConfig.setMinimumIdle(1);
-                // createManager(GCore.getInstance().getDataFolder().getPath() + "/database/" + host + "/", name + ".db");
             }
             default -> throw new IllegalArgumentException("Type de données non pris en charge : " + type);
         }
         dataSource = new HikariDataSource(hikariConfig);
     }
-//    private void createManager(String url, String username, String password){
-//        try {
-//            connection = DriverManager.getConnection(url, username, password);
-//            this.sqlType = SQLType.MYSQL;
-//            logger.info("Connection MySql confirmée");
-//        } catch (SQLException e) {
-//            throw new IllegalStateException("Impossible de se connecter à la base de données", e);
-//        }
-//    }
-//    private void createManager(String path, String fileName){
-//        try {
-//            File file = new File(path);
-//            boolean mkdirs = file.mkdirs();
-//            connection = DriverManager.getConnection("jdbc:sqlite:" + path + fileName);
-//            logger.info("Connection SqLite confirmée");
-//            this.sqlType = SQLType.SQLITE;
-//        } catch (SQLException e) {
-//            throw new IllegalStateException("Impossible de se connecter à la base de données", e);
-//        }
-//    }
 
     public void closeConnection() {
         if (dataSource != null && !dataSource.isClosed()){
@@ -167,7 +147,6 @@ public class DatabasesManager {
         }
         queryBuilder.append(")");
         String query = queryBuilder.toString();
-
         executeUpdate(query);
         logger.info("Table " + name + " créée avec succées dans la base de donnée.");
     }
@@ -204,7 +183,7 @@ public class DatabasesManager {
 
         for (Map.Entry<BaseDataTable.ColumnIdentifier, String> key : values.entrySet()) {
             columnsBuilder.append(key.getKey().getName()).append(", ");
-            valuesBuilder.append("'").append(key.getValue().replace("'", "`")).append("', ");
+            valuesBuilder.append("'").append(key.getValue().replaceAll("'", "`")).append("', ");
         }
 
         columnsBuilder.delete(columnsBuilder.length() - 2, columnsBuilder.length());
@@ -236,5 +215,10 @@ public class DatabasesManager {
     public List<Map<String, Object>> getDataLine(String tablename, String column, String valueColumn){
         String request = "SELECT * FROM " + tablename + " WHERE " + column + " = ?";
         return executeQuery(request, valueColumn);
+    }
+
+    public List<Map<String, Object>> getTop(String tablename, String column, int nb){
+        String request = "SELECT * FROM " + tablename + " ORDER BY " + column + " DESC LIMIT " + nb;
+        return executeQuery(request);
     }
 }

@@ -60,7 +60,7 @@ public final class GCore extends JavaPlugin {
         saveConfig();
         configTest.load();
         GeneralConfig.SQL sql = generalConfig.sqlInfos;
-        this.databasesManager = new DatabasesManager(sql.SQLType, sql.host, sql.port, sql.dataBase, sql.userName, sql.password);
+        this.databasesManager = new DatabasesManager(this, sql.SQLType, sql.host, sql.port, sql.dataBase, sql.userName, sql.password);
         loadTables();
         registerListeners();
         //Test();

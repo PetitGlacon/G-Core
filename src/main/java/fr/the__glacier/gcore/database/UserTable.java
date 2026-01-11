@@ -40,11 +40,11 @@ public class UserTable extends BaseDataTable {
         for (Map<String, Object> map : data){
             try {
                 int id = (int) map.get(ColumnsNames.ID.getName());
-                UUID uuid = UUID.fromString((String) map.get(ColumnsNames.ID.getName()));
-                String name = (String) map.get(ColumnsNames.ID.getName());
-                long firstJoinTime = (long) map.get(ColumnsNames.ID.getName());
-                long lastJoinTime = (long) map.get(ColumnsNames.ID.getName());
-                long lastLeaveTime = (long) map.get(ColumnsNames.ID.getName());
+                UUID uuid = UUID.fromString((String) map.get(ColumnsNames.UUID.getName()));
+                String name = (String) map.get(ColumnsNames.PSEUDO.getName());
+                long firstJoinTime = (long) map.get(ColumnsNames.FIRSTJOINTIME.getName());
+                long lastJoinTime = (long) map.get(ColumnsNames.LASTJOINTIME.getName());
+                long lastLeaveTime = (long) map.get(ColumnsNames.LASTLEAVETIME.getName());
 
                 addUserFromDB(new User(id, uuid, name, firstJoinTime, lastJoinTime, lastLeaveTime));
             } catch (ClassCastException exception){

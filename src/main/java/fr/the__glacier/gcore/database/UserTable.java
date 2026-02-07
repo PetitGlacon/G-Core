@@ -44,7 +44,8 @@ public class UserTable extends BaseDataTable {
                 String name = (String) map.get(ColumnsNames.PSEUDO.getName());
                 long firstJoinTime = (long) map.get(ColumnsNames.FIRSTJOINTIME.getName());
                 long lastJoinTime = (long) map.get(ColumnsNames.LASTJOINTIME.getName());
-                long lastLeaveTime = (long) map.get(ColumnsNames.LASTLEAVETIME.getName());
+                Object obj = map.get(ColumnsNames.LASTLEAVETIME.getName());
+                long lastLeaveTime = obj instanceof Long ? (long) obj : ((Integer) obj).longValue();
 
                 addUserFromDB(new User(id, uuid, name, firstJoinTime, lastJoinTime, lastLeaveTime));
             } catch (ClassCastException exception){

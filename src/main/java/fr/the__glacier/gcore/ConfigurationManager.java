@@ -152,7 +152,7 @@ public class ConfigurationManager {
         save(instance, stringBuilder.substring(0, stringBuilder.length()), name);
     }
     public void save(Object instance, String path, String name){
-
+        if (!path.endsWith(File.separator)) path = path + File.separator;
         saveFile(instance, getFile(path + name));
     }
     public void saveWithFolder(String folderName, Object instance, String... folders){

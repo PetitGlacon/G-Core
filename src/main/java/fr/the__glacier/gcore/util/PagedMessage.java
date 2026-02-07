@@ -90,7 +90,7 @@ public class PagedMessage {
     }
     public String formatBottom(){
         if (bottomType == BottomType.previousAndNextButton){
-            String command = "/gcoreutils " + plugin.getName() + " " + uuid + " ";
+            String command = "/g-core:gcoreutils " + plugin.getName() + " " + uuid + " ";
 
             String previousClickEvent = "<click:run_command:'" + command + (page-1) + "'><hover:show_text:'<white>< page " + (page-1) + "</white>'>";
             String previousClickEventEnd = "</hover></click>";

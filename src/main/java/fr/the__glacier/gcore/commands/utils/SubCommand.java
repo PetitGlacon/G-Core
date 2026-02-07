@@ -1,77 +1,46 @@
 package fr.the__glacier.gcore.commands.utils;
 
 import com.mojang.brigadier.builder.LiteralArgumentBuilder;
-import fr.the__glacier.gcore.color.MiniMessages;
-import fr.the__glacier.gcore.config.configObjects.SubCommandConfig;
-import fr.the__glacier.gcore.util.TimeUtil;
+import fr.the__glacier.gcore.config.configObjects.CommandConfig;
 import io.papermc.paper.command.brigadier.CommandSourceStack;
 import org.bukkit.command.CommandSender;
+import org.bukkit.plugin.Plugin;
 
 
-public abstract class SubCommand {
-    public SubCommandConfig config;
+public abstract class SubCommand extends Command{
+    public Command parentCommand;
 
-    public TimeUtil.CooldownManager mainCooldownManager;
-    private final TimeUtil.CooldownManager cooldownManager;
-    private final String cooldownMessage;
-
-    public SubCommand(SubCommandConfig config, TimeUtil.CooldownManager mainCooldownManager, String cooldownMessage){
-        this.config = config;
-        this.mainCooldownManager = mainCooldownManager;
-        this.cooldownMessage = cooldownMessage;
-        if (config.cooldownInSeconds > 0){
-            this.cooldownManager = new TimeUtil.CooldownManager(config.cooldownInSeconds);
-        } else {
-            this.cooldownManager = null;
+    public SubCommand(Command parentCommand, Plugin plugin, CommandConfig config){
+        super(plugin, config);
+        this.parentCommand = parentCommand;
+    }
+    @Override
+    public void addCooldown(CommandSender sender){
+        parentCommand.addCooldown(sender);
+        if (cooldownManager != null){
+            cooldownManager.addCooldown(sender);
         }
     }
-    public void addCooldown(Object o){
+    @Override
+    public boolean isOnCooldown(CommandSender sender){
+        boolean b = parentCommand.isOnCooldown(sender);
+        if (b) return b;
         if (cooldownManager != null){
-            cooldownManager.addCooldown(o);
+            b = cooldownManager.isOnCooldown(sender);
         }
-        if (mainCooldownManager != null){
-            mainCooldownManager.addCooldown(o);
-        }
-    }
-    public boolean isOnCooldown(Object o){
-
-        boolean b = false;
-        if (cooldownManager != null){
-            b = cooldownManager.isOnCooldown(o);
-        }
-        if (mainCooldownManager != null){
-            b = b || mainCooldownManager.isOnCooldown(o);
-        }
+        if (b) this.sendOnCooldown(sender);
         return b;
     }
-    public long timeRemainingCooldown(Object o){
-        long l = 0;
+    @Override
+    public long timeRemainingCooldown(CommandSender sender){
+        long l = parentCommand.timeRemainingCooldown(sender);
         if (cooldownManager != null){
-            l = cooldownManager.timeUntilEndCooldown(o);
+            long ll = cooldownManager.timeUntilEndCooldown(sender);
+            ll = Math.round((float) ll /1000);
+            l = Math.max(l, ll);
         }
-        if (mainCooldownManager != null){
-            l = Math.max(l, mainCooldownManager.timeUntilEndCooldown(o));
-        }
-        l = Math.round((float) l /1000);
         return l;
-    }
-    public void sendOnCooldown(CommandSender sender){
-        sender.sendMessage(new MiniMessages(this.cooldownMessage
-                .replace("%time%", String.valueOf(timeRemainingCooldown(sender)))
-                .replace("%time_formatted%", TimeUtil.getDurationFormated(timeRemainingCooldown(sender) * 1000))).getComponent());
-    }
-
-    public boolean checkCooldown(CommandSender sender){
-        if (isOnCooldown(sender)){
-            sendOnCooldown(sender);
-            return true;
-        }
-        return false;
     }
 
     public abstract LiteralArgumentBuilder<CommandSourceStack> getCommand(String alias);
-
-    public SubCommandConfig getSubCommandConfig(){
-        return this.config;
-    }
 }

@@ -15,7 +15,7 @@ import org.jetbrains.annotations.Nullable;
 import java.util.*;
 
 @Deprecated
-public class Commands implements CommandExecutor, TabCompleter {
+public class BukkitCommands implements CommandExecutor, TabCompleter {
     @Getter
     public CommandConfig command;
     @Getter
@@ -23,7 +23,7 @@ public class Commands implements CommandExecutor, TabCompleter {
     public Plugin plugin;
     public TimeUtil.CooldownManager cooldownManager;
 
-    public Commands(Plugin plugin, SubCommandsManager1 commandsManager, CommandConfig command){
+    public BukkitCommands(Plugin plugin, SubCommandsManager1 commandsManager, CommandConfig command){
         this.command = command;
         this.commandsManager = commandsManager;
         this.plugin = plugin;

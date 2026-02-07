@@ -1,11 +1,11 @@
 package fr.the__glacier.gcore;
 
 import fr.the__glacier.gcore.commands.GCoreUtils;
-import fr.the__glacier.gcore.commands.utils.BrigadierCommands;
-import fr.the__glacier.gcore.commands.utils.SubCommandsManager;
+import fr.the__glacier.gcore.commands.utils.Command;
 import fr.the__glacier.gcore.commands.gcore.GCoreCommand;
-import fr.the__glacier.gcore.config.Commands;
+import fr.the__glacier.gcore.config.GCoreLang;
 import fr.the__glacier.gcore.config.GeneralConfig;
+import fr.the__glacier.gcore.config.configObjects.BaseLang;
 import fr.the__glacier.gcore.config.configObjects.CommandConfig;
 import fr.the__glacier.gcore.database.DatabasesManager;
 import fr.the__glacier.gcore.database.UserTable;
@@ -19,10 +19,16 @@ import de.tr7zw.changeme.nbtapi.NBT;
 import fr.the__glacier.gcore.util.PagedMessageManager;
 import io.papermc.paper.plugin.lifecycle.event.types.LifecycleEvents;
 import lombok.Getter;
+import net.kyori.adventure.key.Key;
+import net.kyori.adventure.translation.TranslationStore;
 import org.bukkit.Bukkit;
+import org.bukkit.NamespacedKey;
 import org.bukkit.plugin.java.JavaPlugin;
 
+import java.io.File;
+import java.text.MessageFormat;
 import java.util.List;
+import java.util.Locale;
 
 @Getter
 public final class GCore extends JavaPlugin {
@@ -31,7 +37,7 @@ public final class GCore extends JavaPlugin {
 
     private ConfigurationManager configurationManager;
     private GeneralConfig generalConfig;
-    private Commands commands;
+    private fr.the__glacier.gcore.config.Commands commands;
 
     private DatabasesManager databasesManager;
 
@@ -56,9 +62,15 @@ public final class GCore extends JavaPlugin {
             return;
         }
         configurationManager = new ConfigurationManager(ConfigurationManager.PersistType.YAML, this);
+
+        File langFile = new File(getDataFolder(), "lang");
+        if (!langFile.exists()) {
+            langFile.mkdirs();
+        }
+        registerLang(Key.key("gcore:translation"), langFile, GCoreLang.class);
+
         loadConfig();
         saveConfig();
-        configTest.load();
         GeneralConfig.SQL sql = generalConfig.sqlInfos;
         this.databasesManager = new DatabasesManager(this, sql.SQLType, sql.host, sql.port, sql.dataBase, sql.userName, sql.password);
         loadTables();
@@ -76,15 +88,48 @@ public final class GCore extends JavaPlugin {
     public void Test(){
         getServer().getPluginCommand("gcore");
         Bukkit.getPluginManager().registerEvents(new Listeners(), this);
+        configTest = configurationManager.load(ConfigTest.class);
+        configTest2 = configurationManager.load(ConfigTest.class);
+        configurationManager.save(configTest);
+        configurationManager.saveWithFolders(configTest2, "fichier", "bonjour", "test", "test 2");
+        configTest.load();
+    }
+
+    public void registerLang(Key key, File directory, Class<? extends BaseLang> clazz){
+        TranslationStore.StringBased<MessageFormat> store = TranslationStore.messageFormat(key);
+        getLogger().warning("Start loading lang ...");
+        if (!directory.exists()) return;
+        File[] files = directory.listFiles();
+        if (files == null) return;
+        if (files.length == 0) {
+            getLogger().severe("pas de files");
+            GCoreLang fr = GCoreLang.fr_FR();
+            configurationManager.save(fr, "lang", "fr-FR");
+            GCoreLang us = GCoreLang.en_US();
+            configurationManager.save(us, "lang", "en-US");
+        }
+        files = directory.listFiles();
+        for (File file : files){
+            if (!file.getPath().endsWith(".yml")) continue;
+            try {
+                BaseLang lang = configurationManager.load(clazz, file);
+                configurationManager.saveFile(lang, file);
+                String language = file.getName().substring(0, file.getName().length() - 4);
+                lang.register(store, Locale.forLanguageTag(language));
+            } catch (Exception e){
+                getLogger().severe(e.getMessage());
+            }
+        }
+        getLogger().warning("Lang loaded ...");
     }
 
     public void registerCommands(){
-        registerCommand(new GCoreCommand(this, new SubCommandsManager(), commands.GCoreCMD));
-        registerCommand(new GCoreUtils(this, new SubCommandsManager(), new CommandConfig("gcoreutils")));
+        registerCommand(this, new GCoreCommand(this, commands.GCoreCMD));
+        registerCommand(this, new GCoreUtils(this, new CommandConfig("gcoreutils")));
     }
 
-    public void registerCommand(BrigadierCommands command){
-        this.getLifecycleManager().registerEventHandler(LifecycleEvents.COMMANDS, commands -> {
+    public void registerCommand(JavaPlugin plugin, Command command){
+        plugin.getLifecycleManager().registerEventHandler(LifecycleEvents.COMMANDS, commands -> {
             List<String> alias = command.getCommandConfig().alias;
             if (alias == null || alias.isEmpty()){
                 commands.registrar().register(command.getCommand().build());
@@ -95,15 +140,11 @@ public final class GCore extends JavaPlugin {
     }
 
     public void loadConfig(){
-        configTest = configurationManager.load(ConfigTest.class);
-        configTest2 = configurationManager.load(ConfigTest.class);
         generalConfig = configurationManager.load(GeneralConfig.class);
-        commands = configurationManager.load(Commands.class);
+        commands = configurationManager.load(fr.the__glacier.gcore.config.Commands.class);
     }
 
     public void saveConfig(){
-        configurationManager.save(configTest);
-        configurationManager.saveWithFolders(configTest2, "fichier", "bonjour", "test", "test 2");
         configurationManager.save(generalConfig);
         configurationManager.save(commands);
     }

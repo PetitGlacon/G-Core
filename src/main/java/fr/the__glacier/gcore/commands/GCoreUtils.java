@@ -5,12 +5,11 @@ import com.mojang.brigadier.arguments.StringArgumentType;
 import com.mojang.brigadier.context.CommandContext;
 import com.mojang.brigadier.exceptions.CommandSyntaxException;
 import fr.the__glacier.gcore.GCore;
-import fr.the__glacier.gcore.commands.utils.BrigadierCommands;
+import fr.the__glacier.gcore.commands.utils.Command;
 import fr.the__glacier.gcore.commands.utils.SubCommandsManager;
 import fr.the__glacier.gcore.config.configObjects.CommandConfig;
 import fr.the__glacier.gcore.util.PagedMessage;
 import io.papermc.paper.command.brigadier.CommandSourceStack;
-import io.papermc.paper.command.brigadier.Commands;
 import io.papermc.paper.command.brigadier.argument.ArgumentTypes;
 import io.papermc.paper.command.brigadier.argument.resolvers.selector.PlayerSelectorArgumentResolver;
 import org.bukkit.Bukkit;
@@ -20,16 +19,29 @@ import org.bukkit.plugin.Plugin;
 
 import java.util.UUID;
 
-public class GCoreUtils extends BrigadierCommands {
+public class GCoreUtils extends Command {
 
     public GCoreUtils(Plugin plugin, SubCommandsManager commandsManager, CommandConfig command) {
         super(plugin, commandsManager, command);
         registerCommand();
-        this.command.then(Commands.argument("plugin", StringArgumentType.word())
-                .then(Commands.argument("uuid", ArgumentTypes.uuid())
-                        .then(Commands.argument("page", IntegerArgumentType.integer(0))
+        this.command.then(io.papermc.paper.command.brigadier.Commands.argument("plugin", StringArgumentType.word())
+                .then(io.papermc.paper.command.brigadier.Commands.argument("uuid", ArgumentTypes.uuid())
+                        .then(io.papermc.paper.command.brigadier.Commands.argument("page", IntegerArgumentType.integer(0))
                                 .executes(this::send)
-                                .then(Commands.argument("player", ArgumentTypes.players()).suggests((context, builder) -> builder.buildFuture())
+                                .then(io.papermc.paper.command.brigadier.Commands.argument("player", ArgumentTypes.players()).suggests((context, builder) -> builder.buildFuture())
+                                        .executes(this::sendPlayer))
+                        )
+                )
+        ).requires(t -> true);
+    }
+    public GCoreUtils(Plugin plugin, CommandConfig command) {
+        super(plugin, command);
+        registerCommand();
+        this.command.then(io.papermc.paper.command.brigadier.Commands.argument("plugin", StringArgumentType.word())
+                .then(io.papermc.paper.command.brigadier.Commands.argument("uuid", ArgumentTypes.uuid())
+                        .then(io.papermc.paper.command.brigadier.Commands.argument("page", IntegerArgumentType.integer(0))
+                                .executes(this::send)
+                                .then(io.papermc.paper.command.brigadier.Commands.argument("player", ArgumentTypes.players()).suggests((context, builder) -> builder.buildFuture())
                                         .executes(this::sendPlayer))
                         )
                 )

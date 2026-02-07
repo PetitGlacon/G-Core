@@ -6,7 +6,7 @@ plugins {
 }
 
 group = "fr.The__Glacier"
-version = "1.0.0-SNAPSHOT-raw"
+version = "1.0.1-BETA-raw"
 
 repositories {
     mavenLocal()
@@ -65,7 +65,7 @@ publishing {
 
             groupId = "fr.The__Glacier"
             artifactId = "G-Core"
-            version = "1.0.0-SNAPSHOT"  // Version sans le suffixe '-raw'
+            version = "1.0.1-BETA"  // Version sans le suffixe '-raw'
 
             // Associe la publication à l'artefact généré par shadowJar
             artifact(tasks["shadowJar"]) {

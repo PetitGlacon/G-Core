@@ -2,7 +2,8 @@ package fr.the__glacier.gcore.commands.gcore;
 
 import com.mojang.brigadier.context.CommandContext;
 import fr.the__glacier.gcore.GCore;
-import fr.the__glacier.gcore.commands.utils.BrigadierCommands;
+import fr.the__glacier.gcore.commands.utils.Command;
+import fr.the__glacier.gcore.commands.utils.SubCommand;
 import fr.the__glacier.gcore.commands.utils.SubCommandsManager;
 import fr.the__glacier.gcore.commands.gcore.subcmd.Databases;
 import fr.the__glacier.gcore.config.configObjects.CommandConfig;
@@ -10,27 +11,32 @@ import fr.the__glacier.gcore.config.configObjects.SimpleItemConfig;
 import fr.the__glacier.gcore.config.configObjects.gui.Background;
 import fr.the__glacier.gcore.config.configObjects.gui.ItemGUIConfig;
 import fr.the__glacier.gcore.config.configObjects.gui.PagedGUIConfig;
-import fr.the__glacier.gcore.config.configObjects.gui.SimpleGUIConfig;
 import fr.the__glacier.gcore.gui.PagedGUI;
-import fr.the__glacier.gcore.util.PagedMessage;
-import fr.the__glacier.gcore.util.PlayerUtil;
 
 import io.papermc.paper.command.brigadier.CommandSourceStack;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 import org.bukkit.event.inventory.InventoryType;
-import org.bukkit.inventory.ItemFlag;
 
-import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 
-public class GCoreCommand extends BrigadierCommands {
+public class GCoreCommand extends Command {
 
     public GCoreCommand(GCore plugin, SubCommandsManager cmdManager, CommandConfig command){
         super(plugin, cmdManager, command);
         if (command.subCommands != null){
-            this.commandsManager.registerSubCommand(new Databases(command.subCommands.get("database"), this.cooldownManager, command.isOnCooldown));
+            CommandConfig databaseCMDConfig = getSubCommandConfig("database");
+            if (databaseCMDConfig != null) this.commandsManager.registerSubCommand(new Databases(this, plugin, databaseCMDConfig));
+        }
+        registerCommand();
+        this.command.executes(this::test);
+    }
+    public GCoreCommand(GCore plugin, CommandConfig command){
+        super(plugin, command);
+        if (command.subCommands != null){
+            CommandConfig databaseCMDConfig = getSubCommandConfig("database");
+            if (databaseCMDConfig != null) this.commandsManager.registerSubCommand(new Databases(this, plugin, databaseCMDConfig));
         }
         registerCommand();
         this.command.executes(this::test);

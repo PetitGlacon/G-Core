@@ -9,15 +9,17 @@ import java.util.Map;
 public class SubCommandsManager {
     private final Map<String, SubCommand> subCommands = new HashMap<>();
     public void registerSubCommand(@NotNull SubCommand subCommand) {
-        if (!subCommand.getSubCommandConfig().enabled) return;
-        List<String> list = subCommand.getSubCommandConfig().aliases;
-        for (String str : list){
+        if (!subCommand.getCommandConfig().enabled) return;
+        subCommands.put(subCommand.getCommandConfig().name, subCommand);
+        List<String> alias = subCommand.getCommandConfig().alias;
+        if (alias == null) return;
+        for (String str : alias){
             subCommands.put(str, subCommand);
         }
     }
 
     public SubCommand getSubCommand(@NotNull String name) {
-        return subCommands.getOrDefault(name, null);
+        return subCommands.get(name);
     }
 
     public Map<String, SubCommand> getCommandMap() {
